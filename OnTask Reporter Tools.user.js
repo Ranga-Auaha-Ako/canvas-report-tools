@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        OnTask Reporter Tools
 // @author      Damon Ellis & WenChen Hol
-// @namespace   https://github.com/damonkellis/canvascode/
+// @namespace   https://github.com/clearnz/canvas-report-tools/
 // @description For Canvas users at the University of Auckland, this tool generates a .CSV download of the class list and access report for all students in a course
 // @downloadURL https://github.com/damonkellis/canvascode/raw/master/SRESreport.user.js
 // @include     https://*/courses/*/users
