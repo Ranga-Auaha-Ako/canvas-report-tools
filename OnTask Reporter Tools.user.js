@@ -622,7 +622,7 @@ function createOntaskCSV() {
     var CRLF = '\r\n';
 
 
-    var t = titleAr.join(',') + CRLF;//csv first line
+    var t = titleAr.join(',').toLowerCase() + CRLF;//csv first line
 
 //if (debug) { console.log( ontaskReportAr); }
       //for (var item in ontaskReportAr) {
