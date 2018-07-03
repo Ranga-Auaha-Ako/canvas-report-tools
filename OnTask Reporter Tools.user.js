@@ -629,6 +629,9 @@ function createOntaskCSV() {
       for (var id in userData) {
         user = userData[id];
         userId = user.id;
+        if ( user.email=="" || ! ( 'email' in user ) ){
+            continue;
+        }
         item = ontaskReportAr[userId];
        // if (debug) { console.log( userId, item ); }
 
