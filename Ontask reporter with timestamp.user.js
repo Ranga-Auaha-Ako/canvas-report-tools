@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Ontask reporter with timestamp
-// @author      Damon Ellis/Wen
+// @author      Damon Ellis/WenChen Hol
 // @namespace   https://github.com/clearnz/canvas-report-tools/
 // @description For Canvas users at the University of Auckland, this tool generates a .CSV download of the class list and access report for all students in a course
 // @downloadURL https://github.com/clearnz/canvas-report-tools/raw/master/Ontask reporter with timestamp.user.js
