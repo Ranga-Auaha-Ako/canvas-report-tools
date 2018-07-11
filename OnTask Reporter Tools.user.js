@@ -8,7 +8,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
-// @version     2.6.9
+// @version     2.6.10
 // @grant       none
 // ==/UserScript==
 
@@ -560,6 +560,12 @@ function createOntaskCSV() {
      for (var i = 0; i < accessData.length; i++) {
         //get code
         item = accessData[i].asset_user_access;
+         //try to exclude student profile access
+        try {
+          if ( item.asset_category=="roster" ) {
+            continue;
+          }
+        } catch(e){}
         tmpCode = item.asset_code;
         tmpId = item.user_id;
  // if (debug) { console.log(tmpCode); }
