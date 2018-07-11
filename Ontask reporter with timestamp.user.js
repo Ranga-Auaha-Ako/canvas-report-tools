@@ -8,7 +8,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
-// @version     2.6.9
+// @version     2.6.10
 // @grant       none
 // ==/UserScript==
 
@@ -127,6 +127,10 @@
         url = nextURL(jqXHR.getResponseHeader('Link'));
         for (var i = 0; i < udata.length; i++) {
           var user = udata[i];
+          //skip user with empty email
+          if ( user.email=="" || ! ( 'email' in user ) ){
+              continue;
+          }
           try {
             var splitname = user.sortable_name.split(',');
             user.firstname = splitname[1].trim();
@@ -159,55 +163,7 @@
       errorHandler(e);
     }
   }
-  function getStudents(courseId, url) { //cycles through the student list
-    try {
-      if (aborted) {
-        throw new Error('Aborted');
-      }
-      pending++;
-      $.getJSON(url, function (udata, status, jqXHR) {
-        url = nextURL(jqXHR.getResponseHeader('Link'));
-        for (var i = 0; i < udata.length; i++) {
-          var section = udata[i];
-          try {
-              if (section.students.length > 0) {
-                  for (var j = 0; j < section.students.length; j++) {
-                      var user = section.students[j];
-                      user.section_id = section.id;
-                      user.section_name = section.name;
-                      user.sis_section_id = section.sis_section_id;
-                      user.sis_course_id = section.sis_course_id;
-                      var splitname = user.sortable_name.split(',');
-                      user.firstname = splitname[1].trim();
-                      user.surname = splitname[0].trim();
-                      userData[user.id] = user;
-                  } // end for
-              } // end if length>0
-          } catch(e){ continue; }
-        }
-        if (url) {
-          getStudents(courseId, url);
-        }
-        pending--;
-        if (pending <= 0) {
-          if (reporttype == 0) { //branches to get student access data
-            getAccessReport(courseId);
-          }
-          if (reporttype == 1) {
-            makeReport();
-          }
-          if (reporttype == 2) {
-            getAccessReport(courseId);
-          }
-        }
-      }).fail(function () {
-        pending--;
-        throw new Error('Failed to load list of students');
-      });
-    } catch (e) {
-      errorHandler(e);
-    }
-  }
+
   function getAccessReport(courseId) { //cycles through student list
     pending = 0;
     fetched = 0;
@@ -219,6 +175,7 @@
       }
     }
   }
+
   function getAccesses(courseId, url) { //gets usage data for each student individually
     try {
       if (aborted) {
@@ -310,247 +267,7 @@
       errorHandler(e);
     }
   }
-  function createCSV() {
-    var fields = [
-      {
-        'name': 'Canvas User ID',
-        'src': 'u.id'
-      },
-      {
-        'name': 'UoA Username',
-        'src': 'u.login_id',
-        'sis': true
-      },
-      {
-        'name': 'First name',
-        'src': 'u.firstname'
-      },
-      {
-        'name': 'Surname',
-        'src': 'u.surname'
-      },
-      {
-        'name': 'Email',
-        'src': 'u.email'
-      },
-      {
-        'name': 'Display Name',
-        'src': 'u.name'
-      },
-      {
-        'name': 'Sortable Name',
-        'src': 'u.sortable_name'
-      },
-      {
-        'name': 'Category',
-        'src': 'a.asset_category',
-        'accessing': true
-      },
-      {
-        'name': 'Class',
-        'src': 'a.asset_class_name',
-        'accessing': true
-      },
-      {
-        'name': 'Title',
-        'src': 'a.readable_name',
-        'accessing': true
-      },
-      {
-        'name': 'Views by ' + today,
-        'src': 'a.view_score',
-        'accessing': true
-      },
-      {
-        'name': 'Participations by ' + today,
-        'src': 'a.participate_score',
-        'accessing': true
-      },
-      {
-        'name': 'Last Access',
-        'src': 'a.last_access',
-        'fmt': 'date',
-        'accessing': true
-      },
-      {
-        'name': 'First Access',
-        'src': 'a.created_at',
-        'fmt': 'date',
-        'accessing': true
-      },
-      {
-        'name': 'Action',
-        'src': 'a.action_level',
-        'accessing': true
-      },
-      {
-        'name': 'Code',
-        'src': 'a.asset_code',
-        'accessing': true
-      },
-      {
-        'name': 'Group Code',
-        'src': 'a.asset_group_code',
-        'accessing': true
-      },
-      {
-        'name': 'Context Type',
-        'src': 'a.context_type',
-        'accessing': true
-      },
-      {
-        'name': 'Context ID',
-        'src': 'a.context_id',
-        'accessing': true
-      },
-      {
-        'name': 'SIS Login ID',
-        'src': 'u.sis_login_id'
-      },
-      {
-        'name': 'Section',
-        'src': 'u.section_name',
-      },
-      {
-        'name': 'Section ID',
-        'src': 'u.section_id',
-      },
-      {
-        'name': 'SIS Course ID',
-        'src': 'u.sis_course_id',
-        'sis': true
-      },
-      {
-        'name': 'SIS Section ID',
-        'src': 'u.sis_section_id',
-        'sis': true
-      },
-      {
-        'name': 'SIS User ID',
-        'src': 'u.sis_user_id',
-        'sis': true
-      }
-    ];
-    var canSIS = false;
-    for (var id in userData) {
-      if (userData.hasOwnProperty(id)) {
-        if (typeof userData[id].sis_user_id !== 'undefined' && userData[id].sis_user_id) {
-          canSIS = true;
-          break;
-        }
-      }
-    }
-    var CRLF = '\r\n';
-    var hdr = [
-    ];
-    fields.map(function (e) {
-      if (typeof e.sis === 'undefined' || (e.sis && canSIS)) {
-        if (typeof e.accessing === 'undefined' || e.accessing && reporttype == 0) {
-          hdr.push(e.name);
-        }
-      }
-    });
-    var t = hdr.join(',') + CRLF;
-    var item,
-    user,
-    userId,
-    fieldInfo,
-    value;
-    if (reporttype == 0) {
-      for (var i = 0; i < accessData.length; i++) {
-        item = accessData[i].asset_user_access;
-        userId = item.user_id;
-        user = userData[userId];
-        for (var j = 0; j < fields.length; j++) {
-          if (typeof fields[j].sis !== 'undefined' && fields[j].sis && !canSIS) {
-            continue;
-          }
-          fieldInfo = fields[j].src.split('.');
-          value = fieldInfo[0] == 'a' ? item[fieldInfo[1]] : user[fieldInfo[1]];
-          if (value === null) {
-            value = '';
-          } else {
-            if (typeof fields[j].fmt !== 'undefined') {
-              switch (fields[j].fmt) {
-                case 'date':
-                  value = excelDate(value);
-                  break;
-                default:
-                  break;
-              }
-            }
-            if (typeof value === 'string') {
-              var quote = false;
-              if (value.indexOf('"') > - 1) {
-                value = value.replace(/"/g, '""');
-                quote = true;
-              }
-              if (value.indexOf(',') > - 1) {
-                quote = true;
-              }
-              if (quote) {
-                value = '"' + value + '"';
-              }
-            }
-          }
-          if (j > 0) {
-            t += ',';
-          }
-          t += value;
-        }
-        t += CRLF;
-      }
-    }
-    if (reporttype == 1) {
-      for (var id in userData) {
-        item = userData[id];
-        userId = item.id;
-        user = userData[userId];
-        for (var j = 0; j < fields.length; j++) {
-          if (typeof fields[j].sis !== 'undefined' && fields[j].sis && !canSIS) {
-            continue;
-          }
-          if (typeof fields[j].accessing !== 'undefined' && fields[j].accessing) {
-            continue;
-          }
-          fieldInfo = fields[j].src.split('.');
-          value = fieldInfo[0] == 'a' ? item[fieldInfo[1]] : user[fieldInfo[1]];
-          if (value === null) {
-            value = '';
-          } else {
-            if (typeof fields[j].fmt !== 'undefined') {
-              switch (fields[j].fmt) {
-                case 'date':
-                  value = excelDate(value);
-                  break;
-                default:
-                  break;
-              }
-            }
-            if (typeof value === 'string') {
-              var quote = false;
-              if (value.indexOf('"') > - 1) {
-                value = value.replace(/"/g, '""');
-                quote = true;
-              }
-              if (value.indexOf(',') > - 1) {
-                quote = true;
-              }
-              if (quote) {
-                value = '"' + value + '"';
-              }
-            }
-          }
-          if (j > 0) {
-            t += ',';
-          }
-          t += value;
-        }
-        t += CRLF;
-      }
-    }
-    return t;
-  }
+
 //////////////////////////
 function createOntaskCSV() {
     var fields = [
@@ -590,8 +307,7 @@ function createOntaskCSV() {
     var spaceRE = /\s+/g;
     //loop through userData
     for (var id in userData) {
-        //tmpUpi = userData[id].login_id;
-        //tmpAr = [] ;
+
         ontaskReportAr[id] = [];
         ontaskReportAr[id]['id'] = userData[id].id;
         ontaskReportAr[id]['login_id'] = userData[id].login_id;
@@ -607,6 +323,12 @@ function createOntaskCSV() {
      for (var i = 0; i < accessData.length; i++) {
         //get code
         item = accessData[i].asset_user_access;
+        //try to exclude student profile access
+        try {
+          if ( item.asset_category=="roster" ) {
+            continue;
+          }
+        } catch(e){}
         tmpCode = item.asset_code;
         tmpId = item.user_id;
  // if (debug) { console.log(tmpCode); }
