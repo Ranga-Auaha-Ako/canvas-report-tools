@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name        Ontask reporter with timestamp
-// @author      Damon Ellis/WenChen Hol
+// @author      Damon Ellis/Wen
 // @namespace   https://github.com/clearnz/canvas-report-tools/
 // @description For Canvas users at the University of Auckland, this tool generates a .CSV download of the class list and access report for all students in a course
 // @downloadURL https://github.com/clearnz/canvas-report-tools/raw/master/Ontask reporter with timestamp.user.js
@@ -8,7 +8,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
-// @version     2.6.10
+// @version     2.6.11
 // @grant       none
 // ==/UserScript==
 
@@ -272,6 +272,7 @@
 function createOntaskCSV() {
     var fields = [
       'id',
+      'sis_user_id',
       'login_id',
       'firstname',
       'surname',
@@ -284,6 +285,7 @@ function createOntaskCSV() {
 
     var titleAr = [
         'Canvas_User_ID',
+        'AUID',
         'Username',
         'First_name',
         'Surname',
@@ -310,6 +312,7 @@ function createOntaskCSV() {
 
         ontaskReportAr[id] = [];
         ontaskReportAr[id]['id'] = userData[id].id;
+        ontaskReportAr[id]['sis_user_id'] = userData[id].sis_user_id;
         ontaskReportAr[id]['login_id'] = userData[id].login_id;
         ontaskReportAr[id]['firstname'] = userData[id].firstname;
         ontaskReportAr[id]['surname'] = userData[id].surname;
@@ -450,7 +453,7 @@ function createOntaskCSV() {
       if (typeof dt !== 'object') {
         return '';
       }
-      d = dt.getFullYear() + '-' + pad(1 + dt.getMonth()) + '-' + pad(dt.getDate()) + ' ' + pad(dt.getHours()) + ':' + pad(dt.getMinutes()) + ':' + pad(dt.getSeconds());
+      d = (dt.getFullYear()-2000) +  pad(1 + dt.getMonth()) +  pad(dt.getDate()) + ' ' + pad(dt.getHours()) + ':' + pad(dt.getMinutes()) + ':' + pad(dt.getSeconds());
     } catch (e) {
       errorHandler(e);
     }
