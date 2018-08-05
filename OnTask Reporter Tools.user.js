@@ -8,7 +8,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
-// @version     2.6.11
+// @version     2.6.12
 // @grant       none
 // ==/UserScript==
 
@@ -36,7 +36,7 @@
   if (mm < 10) {
     mm = '0' + mm;
   }
-  today = dd + '-' + mm + '-' + yyyy;
+  today = (yyyy-2000 ) + mm + dd + '-' + Math.floor(Date.now() /1000) ;
   var aborted = false;
   addAccessReportButton();
   function addAccessReportButton() {
