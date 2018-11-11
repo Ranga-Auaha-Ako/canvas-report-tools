@@ -38,7 +38,7 @@
     mm = '0' + mm;
   }
   //today = dd + '-' + mm + '-' + yyyy;
-  today = (yyyy-2000 ) + mm + dd  + '-' + Math.floor(Date.now() /1000) ;
+  today = (yyyy-2000 ) + '-' + mm + '-' + dd  + '-' + Math.floor(Date.now() /1000) ;
   var aborted = false;
   addAccessReportButton();
   function addAccessReportButton() {
