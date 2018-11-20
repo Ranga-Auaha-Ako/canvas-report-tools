@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        Ontask reporter with timestamp
+// @name        ALASI workshop reporter with timestamp
 // @author      Damon Ellis/Wen
 // @namespace   https://github.com/clearnz/canvas-report-tools/
 // @description For Canvas users, this tool generates a .CSV download of the class list and access report for all students in a course
