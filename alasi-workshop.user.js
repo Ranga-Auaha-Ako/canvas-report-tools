@@ -128,10 +128,7 @@
         url = nextURL(jqXHR.getResponseHeader('Link'));
         for (var i = 0; i < udata.length; i++) {
           var user = udata[i];
-          //skip user with empty email
-          if ( user.email=="" || ! ( 'email' in user ) ){
-              continue;
-          }
+          
           try {
             var splitname = user.sortable_name.split(',');
             user.firstname = splitname[1].trim();
