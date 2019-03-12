@@ -8,7 +8,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
-// @version     0.1
+// @version     0.1.1
 // @grant       none
 // ==/UserScript==
 
@@ -46,12 +46,23 @@
 
   function addPeerGradingReportButton() {
 
-    if ($('#peer-grading-report').length === 0) {
-      $('#toolbar-1').append('<li class="ui-menu-item" role="presentation"><a id="peer-grading-report" class="ui-corner-all" role="menuitem"><i class="icon-analytics"></i> Peer-Grading Download</a></li>');
-      $('#peer-grading-report').one('click', {
-        type: 2
-      }, peerGradingReport);
-    }
+    var courseId = getCourseId();
+    var assignmentId = getAssignmentId();
+    var rubricId;
+    var url = '/api/v1/courses/' + courseId + '/assignments/' + assignmentId;
+    $.getJSON(url, function (adata, status, jqXHR) {
+      try {
+        rubricId = adata.rubric_settings.id;
+        if (rubricId && $('#peer-grading-report').length === 0) {
+          $('#toolbar-1').append('<li class="ui-menu-item" role="presentation"><a id="peer-grading-report" class="ui-corner-all" role="menuitem"><i class="icon-analytics"></i> Peer-Grading Download</a></li>');
+          $('#peer-grading-report').one('click', {
+            type: 2
+          }, peerGradingReport);
+        }
+      } catch(e){}
+    }).fail(function () {
+    })
+    
     return;
   }
 
