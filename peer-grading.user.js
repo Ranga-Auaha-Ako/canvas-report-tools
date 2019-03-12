@@ -197,22 +197,29 @@
       }
       pending++;
       $.getJSON(url, function (adata, status, jqXHR) {
-        url = nextURL(jqXHR.getResponseHeader('Link'));
-        for ( var i=0; i< adata.assessments.length; i++ ) { 
-          tmpAsetIdAssessorId = adata.assessments[i].artifact_id + "-" +  adata.assessments[i].assessor_id;
-          peer_assessments[ tmpAsetIdAssessorId ] = adata.assessments[i].score;
-        }
-        
-        //store only the assessments array
-        //peer_assessments.push.apply(peer_assessments, adata.assessments);
+        if ( adata.assessments ) {
+          url = nextURL(jqXHR.getResponseHeader('Link'));
+          for ( var i=0; i< adata.assessments.length; i++ ) { 
+            tmpAsetIdAssessorId = adata.assessments[i].artifact_id + "-" +  adata.assessments[i].assessor_id;
+            peer_assessments[ tmpAsetIdAssessorId ] = adata.assessments[i].score;
+          }
+          
+          //store only the assessments array
+          //peer_assessments.push.apply(peer_assessments, adata.assessments);
 
-        if (url) {
-          getPeerAssessments( url, courseId, rubricId );
+          if (url) {
+            getPeerAssessments( url, courseId, rubricId );
+          }
+        
+          pending--;
+          fetched++;
+          progressbar(fetched, needsFetched);
+        } else {
+          abortAll();
+          progressbar();
+          console.log( "No assessment data yet!!" );
         }
-        pending--;
-        fetched++;
-        progressbar(fetched, needsFetched);
-       
+      
       }).fail(function () {
         pending--;
         fetched++;
