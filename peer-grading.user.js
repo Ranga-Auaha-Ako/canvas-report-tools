@@ -8,7 +8,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
-// @version     0.1.2
+// @version     0.1.3
 // @grant       none
 // ==/UserScript==
 
@@ -217,6 +217,7 @@
         } else {
           abortAll();
           progressbar();
+          alert("No assessment data yet!!");
           console.log( "No assessment data yet!!" );
         }
       
@@ -256,7 +257,7 @@
         fetched++;
         progressbar(fetched, needsFetched);
         if (!aborted) {
-          console.log('Some access report data failed to load');
+          console.log('Some report data failed to load');
         }
       });
     } catch (e) {
