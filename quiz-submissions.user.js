@@ -32,7 +32,7 @@
   var dd = today.getDate();
   var mm = today.getMonth() + 1;
   var yyyy = today.getFullYear();
-  var debug = 0;
+  var debug = 1;
   if (dd < 10) {
     dd = '0' + dd;
   }
