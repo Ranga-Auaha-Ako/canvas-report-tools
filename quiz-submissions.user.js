@@ -19,7 +19,7 @@
   var userData = {
   };
   //
-
+ 
   //
   var quiz_submissions = [
   ];
@@ -100,7 +100,7 @@
     var quizId = getQuizId();
     if (debug) console.log( courseId, quizId );
     var url = '/api/v1/courses/' + courseId + '/sections?include[]=students';
-    progressbar(fetched, needsFetched);
+    progressbar();
     pending = 0;
     getStudents( url, courseId, quizId );
 
@@ -165,7 +165,7 @@
   function getQuizSubmissionReport( courseId, quizId ) { //cycles through student list
     pending = 0;
     fetched = 0;
-
+    
     var url = '/api/v1/courses/'+ courseId + '/quizzes/' + quizId + '/submissions?include[]=submission';
     getQuizSubmissions( url, courseId, quizId );
 
@@ -178,6 +178,7 @@
         throw new Error('Aborted');
       }
       pending++;
+      progressbar(fetched, needsFetched);
       $.getJSON(url, function (adata, status, jqXHR) {
         url = nextURL(jqXHR.getResponseHeader('Link'));
         quiz_submissions.push.apply(quiz_submissions, adata["quiz_submissions"]);
@@ -270,7 +271,7 @@
 //////////////////////////
 function createQuizSubmissionCSV() {
     if (debug){
-
+       
       console.log( "quiz_submissions:", quiz_submissions );
     }
     var fields = [
@@ -279,7 +280,6 @@ function createQuizSubmissionCSV() {
       'login_id',
       'name',
       "time_spent",
-      'submission_id',
         'score',
         'kept_score',
         'started_at',
@@ -307,7 +307,6 @@ function createQuizSubmissionCSV() {
         'Username',
         'Display_Name',
         "time_spent",
-        'submission_id',
         'score',
         'kept_score',
         'started_at',
