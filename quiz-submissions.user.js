@@ -52,7 +52,7 @@
       //try {
 
         if ($('#quiz-submissions-report').length === 0) {
-          $('.page-action-list').append('<li><a target="_blank" id="quiz-submissions-report" class="ui-corner-all" role="menuitem"><i class="icon-analytics"></i> Quiz Submissions Download</a></li>');
+          $('.page-action-list').append('<li><a href="javascript:void(0)" target="_blank" id="quiz-submissions-report" class="ui-corner-all" role="menuitem"><i class="icon-analytics"></i> Quiz Submissions Download</a></li>');
           $('#quiz-submissions-report').one('click', {
             type: 2
           }, quizSubmissionReport);
