@@ -52,7 +52,7 @@
       //try {
 
         if ($('#quiz-submissions-report').length === 0) {
-          $('.page-action-list').append('<li><a href="javascript:void(0)" target="_blank" id="quiz-submissions-report" class="ui-corner-all" role="menuitem"><i class="icon-analytics"></i> Quiz Submissions Download</a></li>');
+          $('.page-action-list').append('<li><a href="javascript:void(0)" id="quiz-submissions-report" class="ui-corner-all" role="menuitem"><i class="icon-analytics"></i> Quiz Submissions Download</a></li>');
           $('#quiz-submissions-report').one('click', {
             type: 2
           }, quizSubmissionReport);
@@ -364,7 +364,6 @@ function createQuizSubmissionCSV() {
         if (debug) console.log( "quiz_submissions item:", item );
         // the student
         tmpId = item.user_id;
-        quizSubmissionReportAr[tmpId]['submission_id'] = item['submission_id'];
         quizSubmissionReportAr[tmpId]['score'] = item['score'];
         quizSubmissionReportAr[tmpId]['kept_score'] = item['kept_score'];
         quizSubmissionReportAr[tmpId]['started_at'] = item['started_at'];
