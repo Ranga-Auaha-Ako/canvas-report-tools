@@ -19,7 +19,7 @@
   var userData = {
   };
   //
- 
+
   //
   var quiz_submissions = [
   ];
@@ -165,7 +165,7 @@
   function getQuizSubmissionReport( courseId, quizId ) { //cycles through student list
     pending = 0;
     fetched = 0;
-    
+
     var url = '/api/v1/courses/'+ courseId + '/quizzes/' + quizId + '/submissions?include[]=submission';
     getQuizSubmissions( url, courseId, quizId );
 
@@ -271,7 +271,7 @@
 //////////////////////////
 function createQuizSubmissionCSV() {
     if (debug){
-       
+
       console.log( "quiz_submissions:", quiz_submissions );
     }
     var fields = [
