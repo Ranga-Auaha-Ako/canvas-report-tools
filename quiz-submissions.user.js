@@ -8,7 +8,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
-// @version     0.1.1
+// @version     0.1.2
 // @grant       none
 // ==/UserScript==
 
@@ -239,6 +239,11 @@
 
   function makeReport( courseId, quizId ) { //generates CSV of data
     var csv;
+    var quizTitle="";
+    try {
+        quizTitle=document.title.split( ":" )[0].replace(/[^\w]/g, "");
+    } catch(e){}
+    
     try {
       if (aborted) {
         console.log('Process aborted');
@@ -253,8 +258,8 @@
         var blob = new Blob([csv], {
           'type': 'text/csv;charset=utf-8'
         });
-
-        var savename = 'course-' + courseId + '-quizSubmissions-' + quizId + '-' + today + '.csv';
+        
+        var savename = 'course-' + courseId + '-quizSubmissions-' + quizTitle + '-' + today + '.csv';
           saveAs(blob, savename);
           $('#peer-grading-report').one('click', {
             type: 2
