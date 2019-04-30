@@ -8,7 +8,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
-// @version     0.1.2
+// @version     0.1.3
 // @grant       none
 // ==/UserScript==
 
@@ -22,7 +22,8 @@
 
   //
   var quiz_submissions = [
-  ];
+  ]; // quiz_submissions is array of objects
+  var attemptAr = new Object(); //attemptAr is array of objects
   var pending = - 1;
   var fetched = 0;
   var needsFetched = 0;
@@ -99,7 +100,7 @@
     var courseId = getCourseId();
     var quizId = getQuizId();
     if (debug) console.log( courseId, quizId );
-    var url = '/api/v1/courses/' + courseId + '/sections?include[]=students';
+    var url = '/api/v1/courses/' + courseId + '/sections?include[]=students&per_page=50';
     progressbar();
     pending = 0;
     getStudents( url, courseId, quizId );
@@ -165,14 +166,18 @@
   function getQuizSubmissionReport( courseId, quizId ) { //cycles through student list
     pending = 0;
     fetched = 0;
-
-    var url = '/api/v1/courses/'+ courseId + '/quizzes/' + quizId + '/submissions?include[]=submission';
+    needsFetched = Object.getOwnPropertyNames(userData).length;
+    if (debug) console.log( "needsFetched:", needsFetched );
+    var url = '/api/v1/courses/'+ courseId + '/quizzes/' + quizId + '/submissions?include[]=submission&per_page=100';
     getQuizSubmissions( url, courseId, quizId );
 
   }
 
 
   function getQuizSubmissions( url, courseId, quizId ) { //get peer review data
+    var tmpQuizSubmissions;
+    var tmpItem;
+    var tmpUrl;
     try {
       if (aborted) {
         throw new Error('Aborted');
@@ -180,20 +185,56 @@
       pending++;
       progressbar(fetched, needsFetched);
       $.getJSON(url, function (adata, status, jqXHR) {
+        tmpQuizSubmissions = adata["quiz_submissions"];
+
         url = nextURL(jqXHR.getResponseHeader('Link'));
         quiz_submissions.push.apply(quiz_submissions, adata["quiz_submissions"]);
+        
         if (url) {
           getQuizSubmissions( url, courseId, quizId );
         }
         pending--;
-        fetched++;
+        fetched+=100;
         progressbar(fetched, needsFetched);
+        for (var id in tmpQuizSubmissions ) {
+          tmpItem = tmpQuizSubmissions[id];
+          if( tmpItem["attempt"] >1 ) {
+            //get first attempt time/score record
+            tmpUrl =  '/api/v1/courses/'+ courseId + '/quizzes/' + quizId + '/submissions/' +  tmpItem.id + '?attempt=' + 1;
+            //console.log( "attempt url", tmpUrl );
+            pending ++;
+            $.getJSON(tmpUrl, function (attemptData, status, jqXHR) {
+              //if ( ! attemptAr.includes( tmpItem.id ) ) {
+                attemptAr[ attemptData["quiz_submissions"][0].id ] = new Object();
+              //}
+              attemptAr[ attemptData["quiz_submissions"][0].id ]["time_spent_1"] = attemptData["quiz_submissions"][0].time_spent;
+              attemptAr[ attemptData["quiz_submissions"][0].id ]["score_1"] = attemptData["quiz_submissions"][0].score;
+              if (debug) console.log( "attemptAr:", attemptData["quiz_submissions"][0].id, attemptData["quiz_submissions"][0].time_spent,attemptData["quiz_submissions"][0].score  );
+              if (debug) console.log( attemptAr );
+              pending--;
+              //fetched++;
+              //console.log( "pending:", pending  );
+              if (pending <= 0 && !aborted) {
+                makeReport( courseId, quizId );
+              }
+            }).fail(function () {
+              pending--;
+              //fetched++;
+              //progressbar(fetched, needsFetched);
+              if (!aborted) {
+                console.log('Some report data failed to load');
+              }
+            });
+            
+          }
+        }
+        if (debug) console.log( "pending:", pending  );
         if (pending <= 0 && !aborted) {
           makeReport( courseId, quizId );
         }
       }).fail(function () {
         pending--;
-        fetched++;
+        fetched+=100;
         progressbar(fetched, needsFetched);
         if (!aborted) {
           console.log('Some report data failed to load');
@@ -236,7 +277,7 @@
     return quizId;
   }
 
-
+  
   function makeReport( courseId, quizId ) { //generates CSV of data
     var csv;
     var quizTitle="";
@@ -278,30 +319,35 @@ function createQuizSubmissionCSV() {
     if (debug){
 
       console.log( "quiz_submissions:", quiz_submissions );
+      console.log( "attemptAr", attemptAr  );
+      
     }
+    
     var fields = [
       'id',
       'sis_user_id',
       'login_id',
       'name',
-      "time_spent",
-        'score',
-        'kept_score',
-        'started_at',
-        "end_at",
-        "finished_at",
-        "attempt",
-        "workflow_state",
-        "fudge_points",
-        "quiz_points_possible",
-        "extra_attempts",
-        "extra_time",
-        "manually_unlocked",
-        "score_before_regrade",
-        "has_seen_results",
-        "attempts_left",
-        "overdue_and_needs_submission",
-        "excused?"
+      'attempt',
+      'score',
+      'time_spent',
+      'time_spent_1',
+      'score_1',
+      'kept_score',
+      'started_at',
+      'end_at',
+      'finished_at',
+      'workflow_state',
+      'fudge_points',
+      'quiz_points_possible',
+      'extra_attempts',
+      'extra_time',
+      'manually_unlocked',
+      'score_before_regrade',
+      'has_seen_results',
+      'attempts_left',
+      'overdue_and_needs_submission',
+      'excused?'
     ];
 
     //titleAr to store title for access code
@@ -311,13 +357,15 @@ function createQuizSubmissionCSV() {
         'AUID',
         'Username',
         'Display_Name',
-        "time_spent",
-        'score',
+        "attempt",
+        'last_attempt_score',
+        'last_attempt_time_spent',
+        'first_attempt_time_spent',
+        'first_score',
         'kept_score',
         'started_at',
         "end_at",
         "finished_at",
-        "attempt",
         "workflow_state",
         "fudge_points",
         "quiz_points_possible",
@@ -387,7 +435,11 @@ function createQuizSubmissionCSV() {
         quizSubmissionReportAr[tmpId][ "attempts_left"] = item['attempts_left'];
         quizSubmissionReportAr[tmpId]["overdue_and_needs_submission"] = item['overdue_and_needs_submission'];
         quizSubmissionReportAr[tmpId]["excused?"] = item['excused'];
-
+        //try to add first attempt and score
+        try {
+          quizSubmissionReportAr[tmpId]["time_spent_1"] = attemptAr[item.id]["time_spent_1"];
+          quizSubmissionReportAr[tmpId]["score_1"] = attemptAr[item.id]["score_1"];
+        } catch(e){}
     } // end for
 
     if (debug) console.log( "quizSubmissions:", quizSubmissionReportAr );
