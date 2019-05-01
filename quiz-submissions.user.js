@@ -8,7 +8,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
-// @version     0.1.3
+// @version     0.1.4
 // @grant       none
 // ==/UserScript==
 
@@ -29,6 +29,8 @@
   var needsFetched = 0;
   var reporttype;
   var ajaxPool;
+  var courseId;
+  var quizId;
   var today = new Date();
   var dd = today.getDate();
   var mm = today.getMonth() + 1;
@@ -40,14 +42,14 @@
   if (mm < 10) {
     mm = '0' + mm;
   }
+  //courseId = getCourseId();
+ // quizId = getQuizId(); 
+
   today = (yyyy-2000 ) + '-' + mm  + '-' + dd + '-' + Math.floor(Date.now() /1000) ;
   var aborted = false;
   addQuizSubmissionButton();
 
   function addQuizSubmissionButton() {
-
-    var courseId = getCourseId();
-    var quizId = getQuizId();
 
     //https://canvas.auckland.ac.nz:443/api/v1/courses/29897/quizzes/25662/submissions?include[]=user
       //try {
@@ -97,8 +99,8 @@
     reporttype = e.data.type;
     aborted = false;
     setupPool();
-    var courseId = getCourseId();
-    var quizId = getQuizId();
+    courseId = getCourseId();
+    quizId = getQuizId();
     if (debug) console.log( courseId, quizId );
     var url = '/api/v1/courses/' + courseId + '/sections?include[]=students&per_page=50';
     progressbar();
@@ -127,6 +129,7 @@
       if (aborted) {
         throw new Error('Aborted');
       }
+      jQuery("#doing").html( "Fetching student informaton <img src='https://flexiblelearning.auckland.ac.nz/images/spinner.gif'/>" );
       pending++;
       $.getJSON(url, function (udata, status, jqXHR) {
         url = nextURL(jqXHR.getResponseHeader('Link'));
@@ -168,7 +171,7 @@
     fetched = 0;
     needsFetched = Object.getOwnPropertyNames(userData).length;
     if (debug) console.log( "needsFetched:", needsFetched );
-    var url = '/api/v1/courses/'+ courseId + '/quizzes/' + quizId + '/submissions?include[]=submission&per_page=100';
+    var url = '/api/v1/courses/'+ courseId + '/quizzes/' + quizId + '/submissions?include[]=submission&per_page=50';
     getQuizSubmissions( url, courseId, quizId );
 
   }
@@ -182,6 +185,7 @@
       if (aborted) {
         throw new Error('Aborted');
       }
+      jQuery("#doing").html( "Fetching Quiz Submissions information <img src='https://flexiblelearning.auckland.ac.nz/images/spinner.gif'/>" );
       pending++;
       progressbar(fetched, needsFetched);
       $.getJSON(url, function (adata, status, jqXHR) {
@@ -194,7 +198,7 @@
           getQuizSubmissions( url, courseId, quizId );
         }
         pending--;
-        fetched+=100;
+        fetched+=50;
         progressbar(fetched, needsFetched);
         for (var id in tmpQuizSubmissions ) {
           tmpItem = tmpQuizSubmissions[id];
@@ -234,7 +238,7 @@
         }
       }).fail(function () {
         pending--;
-        fetched+=100;
+        fetched+=50;
         progressbar(fetched, needsFetched);
         if (!aborted) {
           console.log('Some report data failed to load');
@@ -247,6 +251,7 @@
 
   function getCourseId() { //identifies course ID from URL
     var courseId = null;
+    if (debug) console.log( "in getCourseId: window.location", window.location.href );
     try {
       var courseRegex = new RegExp('/courses/([0-9]+)');
       var matches = courseRegex.exec(window.location.href);
@@ -263,6 +268,8 @@
 
   function getQuizId() { //identifies quiz ID from URL
     var quizId = null;
+    if (debug) console.log( "in getQuizId: window.location", window.location.href );
+
     try {
       var quizRegex = new RegExp('/quizzes/([0-9]+)');
       var matches = quizRegex.exec(window.location.href);
@@ -302,9 +309,10 @@
         
         var savename = 'course-' + courseId + '-quizSubmissions-' + quizTitle + '-' + today + '.csv';
           saveAs(blob, savename);
-          $('#peer-grading-report').one('click', {
+          $('#quiz-submissions-report').one('click', {
             type: 2
-          }, getQuizSubmissionReport);
+          }, quizSubmissionReport);
+          resetData();
 
       } else {
         throw new Error('Problem creating report');
@@ -519,7 +527,7 @@ function createQuizSubmissionCSV() {
       if (typeof x === 'undefined' || typeof n == 'undefined') {
         if ($('#jj_progress_dialog').length === 0) {
           $('body').append('<div id="jj_progress_dialog"></div>');
-          $('#jj_progress_dialog').append('<div id="jj_progressbar"></div>');
+          $('#jj_progress_dialog').append('<div id="jj_progressbar"></div><small>It may take a few mins for large courses</small><br><small id="doing"></small>');
           $('#jj_progress_dialog').dialog({
             'title': 'Fetching Report',
             'autoOpen': false,
@@ -527,24 +535,15 @@ function createQuizSubmissionCSV() {
               {
                 'text': 'Cancel',
                 'click': function () {
+                  $('#quiz-submissions-report').one('click', {
+                    type: 2
+                  }, quizSubmissionReport);
+                  if (debug) console.log( "done set submission report link" );
                   $(this).dialog('close');
                   aborted = true;
                   abortAll();
-                  pending = - 1;
-                  fetched = 0;
-                  needsFetched = 0;
-                  if (reporttype == 0) {
-                    $('#jj_access_report').one('click', {
-                      type: 0
-                    }, accessReport);
-                  }
-                  if (reporttype == 1) {
-                    $('#jj_student_report').one('click', {
-                      type: 1
-                    }, accessReport);
+                  resetData();
 
-
-                  }
                 }
               }
             ]
@@ -554,9 +553,11 @@ function createQuizSubmissionCSV() {
           $('#jj_progress_dialog').dialog('close');
         } else {
           $('#jj_progressbar').progressbar({
-            'value': false
+            //'value': false
+            'value': 0
           });
           $('#jj_progress_dialog').dialog('open');
+          
         }
       } else {
         if (!aborted) {
@@ -567,7 +568,17 @@ function createQuizSubmissionCSV() {
     } catch (e) {
       errorHandler(e);
     }
+    
   }
+  function resetData(){
+    userData = {};
+    quiz_submissions = [];
+    attemptAr = new Object();
+    pending = - 1;
+    fetched = 0;
+    needsFetched = 0;
+  }
+
   function errorHandler(e) {
     console.log(e.name + ': ' + e.message);
   }
