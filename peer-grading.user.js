@@ -62,7 +62,7 @@
       } catch(e){}
     }).fail(function () {
     })
-
+    
     return;
   }
 
@@ -116,9 +116,9 @@
       }
       //return rubricId;
     });
-
-
-
+    
+   
+   
   }
 
   function nextURL(linkTxt) { //if more than 100 students, gets the URL for the rest of the list
@@ -164,9 +164,9 @@
         }
         pending--;
         if (pending <= 0) {
-
+         
             getPeerReviewReport( courseId, assignmentId, rubricId );
-
+    
         }
       }).fail(function () {
         pending--;
@@ -185,7 +185,7 @@
     getPeerAssessments( url, courseId, rubricId );
     url = '/api/v1/courses/'+ courseId + '/assignments/' + assignmentId +'/peer_reviews';
     getPeerReview( url, courseId, assignmentId, rubricId );
-
+    
   }
 
   function getPeerAssessments( url, courseId, rubricId ) { //get peer review data
@@ -199,18 +199,18 @@
       $.getJSON(url, function (adata, status, jqXHR) {
         if ( adata.assessments ) {
           url = nextURL(jqXHR.getResponseHeader('Link'));
-          for ( var i=0; i< adata.assessments.length; i++ ) {
+          for ( var i=0; i< adata.assessments.length; i++ ) { 
             tmpAsetIdAssessorId = adata.assessments[i].artifact_id + "-" +  adata.assessments[i].assessor_id;
             peer_assessments[ tmpAsetIdAssessorId ] = adata.assessments[i].score;
           }
-
+          
           //store only the assessments array
           //peer_assessments.push.apply(peer_assessments, adata.assessments);
 
           if (url) {
             getPeerAssessments( url, courseId, rubricId );
           }
-
+        
           pending--;
           fetched++;
           progressbar(fetched, needsFetched);
@@ -220,7 +220,7 @@
           alert("No assessment data yet!!");
           console.log( "No assessment data yet!!" );
         }
-
+      
       }).fail(function () {
         pending--;
         fetched++;
@@ -297,7 +297,7 @@
     return assignmentId;
   }
 
-
+ 
   function makeReport( courseId, assignmentId ) { //generates CSV of data
     var csv;
     try {
@@ -307,20 +307,22 @@
         return;
       }
       progressbar();
-
+     
        csv = createPeerAssessmentCSV();
-
+     
       if (csv) {
         var blob = new Blob([csv], {
           'type': 'text/csv;charset=utf-8'
         });
-
+        
         var savename = 'course-' + courseId + '-peerAssessment-' + assignmentId + '-' + today + '.csv';
           saveAs(blob, savename);
           $('#peer-grading-report').one('click', {
             type: 2
           }, peerGradingReport);
-
+          //reset data
+          resetData();
+       
       } else {
         throw new Error('Problem creating report');
       }
@@ -328,11 +330,11 @@
       errorHandler(e);
     }
   }
-
+  
 //////////////////////////
 function createPeerAssessmentCSV() {
     if (debug){
-      console.log( "peer_assessments:", peer_assessments  );
+      console.log( "peer_assessments:", peer_assessments  ); 
       console.log( "peer_reviews:", peer_reviews );
     }
     var fields = [
@@ -387,14 +389,14 @@ function createPeerAssessmentCSV() {
         item = peer_reviews[id];
          //try to exclude student profile access
         if (debug) console.log( "peer_reviews item:", item );
-        // the student
+        // the student 
         tmpId = item.user_id;
         tmpReviewerId = item.assessor_id;
         tmpAssetId = item.asset_id;
         tmpObjLength = Object.keys( peerGradingReportAr[tmpId] ).length;
-        reviewNumber = (tmpObjLength-4)/2+ 1;
+        reviewNumber = (tmpObjLength-4)/3 + 1;
         reviewNumber = reviewNumber.toFixed(0);
-        if (debug) {
+        if (debug) { 
           console.log( "reviewNumber:", reviewNumber );
           console.log( "targetAssessmentId:", tmpAssetId + "-" + tmpReviewerId );
         }
@@ -431,7 +433,7 @@ function createPeerAssessmentCSV() {
       for (var id in userData) {
         user = userData[id];
         userId = user.id;
-
+        
         item = peerGradingReportAr[userId];
        // if (debug) { console.log( userId, item ); }
 
@@ -545,6 +547,16 @@ function createPeerAssessmentCSV() {
     } catch (e) {
       errorHandler(e);
     }
+  }
+  function resetData(){
+    userData = { };
+    //
+    peer_assessments = [];
+    //
+    peer_reviews = [];
+    pending = - 1;
+    fetched = 0;
+    needsFetched = 0;
   }
   function errorHandler(e) {
     console.log(e.name + ': ' + e.message);
