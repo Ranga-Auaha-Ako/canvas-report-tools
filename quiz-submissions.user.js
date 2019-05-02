@@ -3,7 +3,7 @@
 // @author      WenChen Hol
 // @namespace   https://github.com/clearnz/canvas-report-tools/
 // @description For Canvas users, this tool generates a .CSV download of the quiz submissions information
-// @downloadURL https://github.com/clearnz/canvas-report-tools/raw/master/peer-marking.js
+// @downloadURL https://github.com/clearnz/canvas-report-tools/raw/master/quiz-submissions.user.js
 // @include     https://*/courses/*/quizzes/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
