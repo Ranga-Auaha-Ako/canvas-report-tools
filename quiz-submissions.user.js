@@ -2,7 +2,7 @@
 // @name        Canvas quiz submissions information download
 // @author      WenChen Hol
 // @namespace   https://github.com/clearnz/canvas-report-tools/
-// @description For Canvas users at the University of Auckland, this tool generates a .CSV download of the peer marking record in an peer-marking assignent
+// @description For Canvas users, this tool generates a .CSV download of the quiz submissions information
 // @downloadURL https://github.com/clearnz/canvas-report-tools/raw/master/peer-marking.js
 // @include     https://*/courses/*/quizzes/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
