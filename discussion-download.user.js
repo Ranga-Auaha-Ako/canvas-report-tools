@@ -9,7 +9,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/jszip.min.js
-// @version     0.1.1
+// @version     0.1.2
 // @grant       none
 // ==/UserScript==
 
@@ -34,6 +34,7 @@
   var dd = today.getDate();
   var mm = today.getMonth() + 1;
   var yyyy = today.getFullYear();
+  var zip = new JSZip();
   var debug = 0;
   if (dd < 10) {
     dd = '0' + dd;
@@ -220,7 +221,7 @@
     var tmpName;
     var blob;
     var savename;
-    var zip = new JSZip();
+    
 
     try {
         discussionTitle=document.title.split( ":" )[1].replace(/[^\w]/g, "");
@@ -243,15 +244,19 @@
         tmpName= "";
       }
       if ( tmpName !="" && tmpPost!="" ) {
-        blob = new Blob([csv], {
-          'type': 'text/plain;charset=utf-8'
-        });
+        //blob = new Blob([csv], {
+         // 'type': 'text/plain;charset=utf-8'
+        //});
         
         savename = 'course-' + courseId + '-discussion-' + discussionTitle + '-' + tmpName + '.txt';
         if (debug) console.log( "savename:", savename ); 
         if (debug) console.log( "post:", tmpPost ); 
         zip.file( savename, tmpPost ); 
         //saveAs(blob, savename);
+        //process reply array
+        if ( 'replies' in discussionPosts[i] ) {
+          processReplies( courseId, discussionTitle, tmpName, discussionPosts[i].replies );
+        }
       }
     }
     zip.generateAsync({type:"blob"})
@@ -259,38 +264,44 @@
         // Force down of the Zip file
         saveAs(content, discussionTitle+".zip");
     });
-    //.replace(/<\/?[^>]+(>|$)/g, "");
-    // try {
-    //   if (aborted) {
-    //     console.log('Process aborted');
-    //     aborted = false;
-    //     return;
-    //   }
-    //   progressbar();
-
-    //   csv = createDiscussionPost();
-
-    //   if (csv) {
-    //     var blob = new Blob([csv], {
-    //       'type': 'text/plain;charset=utf-8'
-    //     });
-        
-    //     var savename = 'course-' + courseId + '-quizSubmissions-' + discussionTitle + '-' + today + '.csv';
-    //       saveAs(blob, savename);
-    //       $('#quiz-submissions-report').one('click', {
-    //         type: 2
-    //       }, discussionSubmissionReport);
-    //       resetData();
-
-    //   } else {
-    //     throw new Error('Problem creating report');
-    //   }
-    // } catch (e) {
-    //   errorHandler(e);
-    // }
+ 
   }
 
-//////////////////////////
+function processReplies( courseId, discussionTitle, msgOwner, replyAr ){
+  var tmpReplyObj;
+  var tmpName;
+  var tmpPost;
+  var savename;
+  for (var i = 0; i < replyAr.length; i++) {
+      tmpReplyObj = replyAr[i];
+      try { 
+        tmpName = participants[tmpReplyObj.user_id].display_name.replace(/ /g, "");
+      } catch(e){
+        tmpName= "";
+      }
+      try{ 
+        tmpPost = tmpReplyObj.message.replace(/<\/?[^>]+(>|$)/g, "");
+      } catch(e){
+        tmpPost = "";
+      }
+      if ( tmpName !="" && tmpPost!="" && tmpPost.length>20 ) {
+       // blob = new Blob([csv], {
+       //   'type': 'text/plain;charset=utf-8'
+       // });
+        
+        savename = 'course-' + courseId + '-discussion-' + discussionTitle + '-' + tmpName + '-reply-' + msgOwner + '.txt';
+        if (debug) console.log( "savename:", savename ); 
+        if (debug) console.log( "post:", tmpPost ); 
+        zip.file( savename, tmpPost ); 
+        //saveAs(blob, savename);
+        //process reply array
+        if ( 'replies' in tmpReplyObj ) {
+          processReplies( courseId, discussionTitle, tmpName, tmpReplyObj.replies );
+        }
+      }
+  }
+}
+
 function createDiscussionPost() {
    var t="";
     //loop through 
