@@ -9,7 +9,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/jszip.min.js
-// @version     0.1.2
+// @version     0.1.3
 // @grant       none
 // ==/UserScript==
 
@@ -248,7 +248,7 @@
          // 'type': 'text/plain;charset=utf-8'
         //});
         
-        savename = 'course-' + courseId + '-discussion-' + discussionTitle + '-' + tmpName + '.txt';
+        savename = 'course-' + courseId + '-discussion-' + discussionTitle + '-' + tmpName + '-' + discussionPosts[i].id + '.txt';
         if (debug) console.log( "savename:", savename ); 
         if (debug) console.log( "post:", tmpPost ); 
         zip.file( savename, tmpPost ); 
@@ -289,7 +289,7 @@ function processReplies( courseId, discussionTitle, msgOwner, replyAr ){
        //   'type': 'text/plain;charset=utf-8'
        // });
         
-        savename = 'course-' + courseId + '-discussion-' + discussionTitle + '-' + tmpName + '-reply-' + msgOwner + '.txt';
+        savename = 'course-' + courseId + '-discussion-' + discussionTitle + '-' + tmpName + '-reply-' + msgOwner + '-' + tmpReplyObj.id  + '.txt';
         if (debug) console.log( "savename:", savename ); 
         if (debug) console.log( "post:", tmpPost ); 
         zip.file( savename, tmpPost ); 
