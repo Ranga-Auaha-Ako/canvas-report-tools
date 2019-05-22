@@ -8,7 +8,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
-// @version     0.1.4
+// @version     0.1.5
 // @grant       none
 // ==/UserScript==
 
@@ -33,7 +33,7 @@
   var dd = today.getDate();
   var mm = today.getMonth() + 1;
   var yyyy = today.getFullYear();
-  var debug = 1;
+  var debug = 0;
   if (dd < 10) {
     dd = '0' + dd;
   }
@@ -103,7 +103,7 @@
     var url = '/api/v1/courses/' + courseId + '/assignments/' + assignmentId;
     $.getJSON(url, function (adata, status, jqXHR) {
       rubricId = adata.rubric_settings.id;
-      console.log( "rubricId:", rubricId );
+      if (debug) console.log( "rubricId:", rubricId );
       var url = '/api/v1/courses/' + courseId + '/sections?include[]=students';
       progressbar();
       pending = 0;
@@ -369,6 +369,7 @@ function createPeerAssessmentCSV() {
     var reviewNumber, maxReviewerNumber;
     var tmpAssetId;
     var tmpObjLength;
+    var tmpWorkflow_state='';
     maxReviewerNumber = 0;
 
     //loop through userData
@@ -383,7 +384,7 @@ function createPeerAssessmentCSV() {
         peerGradingReportAr[id]['name'] = userData[id].name;
     }
 
-    //loop through accessData to save in ontaskReport
+    //loop through peer_reviews assigned array to get each score from peer_assessments
      for (var id in peer_reviews ) {
         //get code
         item = peer_reviews[id];
@@ -393,23 +394,36 @@ function createPeerAssessmentCSV() {
         tmpId = item.user_id;
         tmpReviewerId = item.assessor_id;
         tmpAssetId = item.asset_id;
-        tmpObjLength = Object.keys( peerGradingReportAr[tmpId] ).length;
+        tmpWorkflow_state = item.workflow_state;
+        // in case some user drop out during the assignment
+        if (! (tmpId in peerGradingReportAr) ){
+          continue;
+        }
+        try {
+            tmpObjLength = Object.keys( peerGradingReportAr[tmpId] ).length;
+        }catch(e){
+            console.log( "grading report cannot become object:", tmpId, peerGradingReportAr[tmpId] );
+            tmpObjLength = 0;
+        }
         reviewNumber = (tmpObjLength-4)/3 + 1;
         reviewNumber = reviewNumber.toFixed(0);
         if (debug) { 
           console.log( "reviewNumber:", reviewNumber );
           console.log( "targetAssessmentId:", tmpAssetId + "-" + tmpReviewerId );
         }
-        if ( peer_assessments[ tmpAssetId + "-" + tmpReviewerId ] !==null ){
+        if ( (tmpAssetId + "-" + tmpReviewerId) in peer_assessments ){
           peerGradingReportAr[tmpId]["score"+ reviewNumber] = peer_assessments[ tmpAssetId + "-" + tmpReviewerId ];
         } else {
-          peerGradingReportAr[tmpId]["score"+ reviewNumber] = 0;
+          peerGradingReportAr[tmpId]["score"+ reviewNumber] = 'not reviewed';
         }
 
         //peerGradingReportAr[tmpId]["reviewer"+ reviewNumber]=tmpReviewerId + ":" + userData[tmpReviewerId].name;
         peerGradingReportAr[tmpId]["reviewerId"+ reviewNumber] = tmpReviewerId;
-        peerGradingReportAr[tmpId]["reviewerName"+ reviewNumber] = userData[tmpReviewerId].name;
-
+        try {
+            peerGradingReportAr[tmpId]["reviewerName"+ reviewNumber] = userData[tmpReviewerId].name;
+        } catch(e){
+            peerGradingReportAr[tmpId]["reviewerName"+ reviewNumber] = 'not exist';
+        }
         if ( reviewNumber > maxReviewerNumber ){
           maxReviewerNumber = reviewNumber;
           titleAr.push( "score" + reviewNumber ) ;
