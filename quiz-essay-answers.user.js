@@ -21,8 +21,8 @@
   };
   // questionsArray to store questions
   //var questionsArray = [];
-  // answersArray to store answers of each questions
-  //var answersArray = [];
+  // answersArray to store answers of each questions 
+  //var answersArray = []; 
 
   var pending = - 1;
   var fetched = 0;
@@ -45,7 +45,7 @@
     mm = '0' + mm;
   }
   //courseId = getCourseId();
- // quizId = getQuizId();
+ // quizId = getQuizId(); 
 
   today = (yyyy-2000 ) + '-' + mm  + '-' + dd + '-' + Math.floor(Date.now() /1000) ;
   var aborted = false;
@@ -53,15 +53,15 @@
 
   function addQuizEssayAnswersButton() {
 
-
+    
 
         if ($('#quiz-answers-report').length === 0) {
-          $('.page-action-list').append('<li><a href="javascript:void(0)" id="quiz-essay-answers-report" class="ui-corner-all" role="menuitem"><i class="icon-analytics"></i> Quiz Answers Download</a></li>');
+          $('.page-action-list').append('<li><a href="javascript:void(0)" id="quiz-essay-answers-report" class="ui-corner-all" role="menuitem"><i class="icon-analytics"></i> Quiz Essay Answers Download</a></li>');
           $('#quiz-essay-answers-report').one('click', {
             type: 2
           }, quizEssayAnswersReport);
         }
-
+    
 
 
     return;
@@ -238,7 +238,7 @@
       getQuizAnswers( url, courseId, quizId, tmpName );
 
     }
-
+  
     //makeReport( courseId, quizId );
 
   }
@@ -261,12 +261,12 @@
         let totalAns = "";
         jQuery(adata).find('.quiz_response_text').each(
           function(){
-
+            
             var tmpAns = jQuery( this ).text().trim();
             if (debug) console.log( "answer:", tmpAns);
             if ( tmpAns == "" ){
               //pending--;
-              return;
+              return; 
             }
             let tmpQuestionObj = jQuery( this ).closest('.question').find('.question_text')[0];
             let tmpQuestion = jQuery(tmpQuestionObj).text().trim();
@@ -275,14 +275,14 @@
               //pending--;
               //return;
             }
-            //quotation around question to avoid turnitin
+            //quotation around question to avoid turnitin 
             totalAns += '"Question:' + tmpQuestion + '"\n' + tmpAns + "\n";
           }
         );
         savename = 'course-' + courseId + '-questions-' + tmpName + '.txt';
-        if (debug) console.log( "savename:", savename );
-        if (debug) console.log( "totalAns:", totalAns );
-        zip.file( savename, totalAns );
+        if (debug) console.log( "savename:", savename ); 
+        if (debug) console.log( "totalAns:", totalAns ); 
+        zip.file( savename, totalAns ); 
         pending--;
         if (debug) console.log( "get quizAnswers pending:", pending );
         if (pending <= 0 && !aborted) {
@@ -336,7 +336,7 @@
     return quizId;
   }
 
-
+  
   function makeReport( courseId, quizId ) { //generates CSV of data
     var csv;
     var quizTitle="";
@@ -346,7 +346,7 @@
         courseTitle=document.title.split( ":" ).slice(-1)[0].replace(/[^\w]/g, "");
         quizTitle=document.title.split( ":" )[0].replace(/[^\w]/g, "");
     } catch(e){}
-
+   
 
     //try {
       if (aborted) {
@@ -360,18 +360,18 @@
       // Force down of the Zip file
         saveAs(content, courseTitle+"-"+ quizTitle+ "-" + today + ".zip");
       } );
-
+      
         $('#quiz-essay-answers-report').one('click', {
             type: 2
         }, quizEssayAnswersReport);
         resetData();
 
-
+      
     //} catch (e) {
     //  errorHandler(e);
     //}
   }
-
+ 
 
   function progressbar(x, n) {
     try {
@@ -408,7 +408,7 @@
             'value': 0
           });
           $('#jj_progress_dialog').dialog('open');
-
+          
         }
       } else {
         if (!aborted) {
@@ -419,12 +419,12 @@
     } catch (e) {
       errorHandler(e);
     }
-
+    
   }
   function resetData(){
     //questionsArray = [];
-    // answersArray to store answers of each questions
-    //answersArray = [];
+    // answersArray to store answers of each questions 
+    //answersArray = []; 
     resultUrlArray = [];
     pending = - 1;
     fetched = 0;
