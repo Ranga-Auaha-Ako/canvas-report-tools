@@ -139,6 +139,19 @@
         url = nextURL(jqXHR.getResponseHeader('Link'));
         for (var i = 0; i < udata.length; i++) {
           var section = udata[i];
+          //return if no students
+          if ( i==0 && section.students===null ){
+            
+              pending--;
+              alert( "No student found" );
+              $('#jj_progress_dialog').dialog('close');
+              $('#quiz-essay-answers-report').one('click', {
+                type: 2
+              }, quizEssayAnswersReport);
+              resetData();
+              throw new Error('Failed to load list of students');
+            
+          }
           try {
               if (section.students.length > 0) {
                   for (var j = 0; j < section.students.length; j++) {
@@ -150,15 +163,7 @@
                       userData[user.id] = user;
                   } // end for
               } // end if length>0
-              else{
-                pending--;
-                throw new Error('Failed to load list of students');
-                $('#quiz-essay-answers-report').one('click', {
-                  type: 2
-                }, quizEssayAnswersReport);
-                resetData();
-                return;
-              }
+              
           } catch(e){ continue; }
         }
         if (url) {
@@ -173,10 +178,13 @@
         }
       }).fail(function () {
         pending--;
+        $('#jj_progress_dialog').dialog('close');
         throw new Error('Failed to load list of students');
+
       });
     } catch (e) {
       errorHandler(e);
+      $('#jj_progress_dialog').dialog('close');
     }
   }
   function getAnswers( url, courseId, quizId ) { //cycles through the student list
@@ -227,7 +235,7 @@
         }
       }).fail(function () {
         pending--;
-        throw new Error('Failed to load list of students');
+        throw new Error('Failed to load student submissions');
       });
     } catch (e) {
       errorHandler(e);
