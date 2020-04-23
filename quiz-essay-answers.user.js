@@ -9,7 +9,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/jszip.min.js
-// @version     0.2
+// @version     0.3
 // @grant       none
 // ==/UserScript==
 
@@ -150,6 +150,15 @@
                       userData[user.id] = user;
                   } // end for
               } // end if length>0
+              else{
+                pending--;
+                throw new Error('Failed to load list of students');
+                $('#quiz-essay-answers-report').one('click', {
+                  type: 2
+                }, quizEssayAnswersReport);
+                resetData();
+                return;
+              }
           } catch(e){ continue; }
         }
         if (url) {
