@@ -5,9 +5,11 @@
 // @description For Canvas users, this tool generates a .CSV download of the quiz submissions information
 // @downloadURL https://github.com/clearnz/canvas-report-tools/raw/master/discusson-download.user.js
 // @include     https://*/courses/*/discussion_topics/*
+// @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
+// @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/jszip.min.js
-// @version     0.1.4
+// @version     0.1.5
 // @grant       none
 // ==/UserScript==
 
