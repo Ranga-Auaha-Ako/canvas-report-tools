@@ -276,7 +276,7 @@
               //return;
             }
             //quotation around question to avoid turnitin 
-            totalAns += '"Question:' + tmpQuestion + '"\n' + tmpAns + "\n";
+            totalAns += "'Question:" + tmpQuestion + "'\n" + tmpAns + "\n";
           }
         );
         savename = 'course-' + courseId + '-questions-' + tmpName + '.txt';
