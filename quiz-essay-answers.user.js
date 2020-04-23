@@ -9,7 +9,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/jszip.min.js
-// @version     0.1
+// @version     0.2
 // @grant       none
 // ==/UserScript==
 
@@ -276,10 +276,10 @@
               //return;
             }
             //quotation around question to avoid turnitin 
-            totalAns += "'Question:" + tmpQuestion + "'\n" + tmpAns + "\n";
+            totalAns += '"Question:' + tmpQuestion + '"\n' + tmpAns + "\n";
           }
         );
-        savename = 'course-' + courseId + '-questions-' + tmpName + '.txt';
+        savename = tmpName + '-course-' + courseId + '.txt';
         if (debug) console.log( "savename:", savename ); 
         if (debug) console.log( "totalAns:", totalAns ); 
         zip.file( savename, totalAns ); 
