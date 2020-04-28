@@ -202,6 +202,20 @@
         url = nextURL(jqXHR.getResponseHeader('Link'));
         quiz_submissions = udata.quiz_submissions;
         if (debug) console.log( "quiz_submissions:", quiz_submissions );
+
+		
+		if ( quiz_submissions.length==0 || quiz_submissions===null ){
+            
+              pending--;
+              alert( "No submission found" );
+              $('#jj_progress_dialog').dialog('close');
+              $('#quiz-essay-answers-report').one('click', {
+                type: 2
+              }, quizEssayAnswersReport);
+              resetData();
+              throw new Error('Failed to load list of students');
+            
+        }
 		needsFetched = quiz_submissions.length;
         for (var i = 0; i < quiz_submissions.length; i++) {
           var submission = quiz_submissions[i];
@@ -219,9 +233,9 @@
 
           try {
               if ( "result_url" in submission && submission.result_url!="" ) {
-                resultUrlArray.push( [ submission.result_url, tmpName ] );
+                resultUrlArray.push( [ submission.result_url, tmpName+"-"+studentid ] );
               } else if ( "html_url" in submission && submission.html_url!="" ) {
-                resultUrlArray.push( [submission.html_url, tmpName] );
+                resultUrlArray.push( [submission.html_url, tmpName+"-"+studentid] );
               }
           } catch(e){ continue; }
         }
