@@ -9,7 +9,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/jszip.min.js
-// @version     0.3
+// @version     0.4
 // @grant       none
 // ==/UserScript==
 
@@ -202,10 +202,11 @@
         url = nextURL(jqXHR.getResponseHeader('Link'));
         quiz_submissions = udata.quiz_submissions;
         if (debug) console.log( "quiz_submissions:", quiz_submissions );
-
+		needsFetched = quiz_submissions.length;
         for (var i = 0; i < quiz_submissions.length; i++) {
           var submission = quiz_submissions[i];
           let studentid =  submission.user_id;
+		  progressbar(i, quiz_submissions.length);
           if (debug) console.log( submission, studentid );
           try {
             tmpName = userData[ studentid ].short_name.replace(/ /g, "");
@@ -273,8 +274,9 @@
       if (debug) console.log( url );
       jQuery("#doing").html( "Fetching question answers <img src='https://flexiblelearning.auckland.ac.nz/images/spinner.gif'/>" );
       //pending++;
-      //progressbar(fetched, needsFetched);
+      progressbar(fetched, needsFetched);
       $.get(url, function (adata, status, jqXHR) {
+		fetched +=1;
         let totalAns = "";
         jQuery(adata).find('.quiz_response_text').each(
           function(){
@@ -294,6 +296,8 @@
             }
             //quotation around question to avoid turnitin 
             totalAns += '"Question:' + tmpQuestion + '"\n' + tmpAns + "\n";
+	        progressbar(fetched, needsFetched);
+
           }
         );
         savename = tmpName + '-course-' + courseId + '.txt';
