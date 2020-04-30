@@ -8,7 +8,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
-// @version     0.1
+// @version     0.1.5
 // @grant       none
 // ==/UserScript==
 
@@ -35,7 +35,7 @@
   var dd = today.getDate();
   var mm = today.getMonth() + 1;
   var yyyy = today.getFullYear();
-  var debug = 0;
+  var debug = 1;
   var maxAtmps=0;
   if (dd < 10) {
     dd = '0' + dd;
@@ -44,7 +44,7 @@
     mm = '0' + mm;
   }
   //courseId = getCourseId();
- // quizId = getQuizId(); 
+ // quizId = getQuizId();
 
   today = (yyyy-2000 ) + '-' + mm  + '-' + dd + '-' + Math.floor(Date.now() /1000) ;
   var aborted = false;
@@ -56,7 +56,7 @@
       //try {
 
         if ($('#quiz-all-submissions-report').length === 0) {
-          $('.page-action-list').append('<li><a href="javascript:void(0)" id="quiz-all-submissions-report" class="ui-corner-all" role="menuitem"><i class="icon-analytics"></i> Quiz All Submissions Information Download</a></li>');
+          $('.page-action-list').append('<li><a href="javascript:void(0)" id="quiz-all-submissions-report" class="ui-corner-all" role="menuitem"><i class="icon-analytics"></i> Quiz All Submissions Download</a></li>');
           $('#quiz-all-submissions-report').one('click', {
             type: 2
           }, quizSubmissionReport);
@@ -182,7 +182,7 @@
     var tmpQuizSubmissions;
     var tmpItem;
     var tmpUrl;
-    
+
     try {
       if (aborted) {
         throw new Error('Aborted');
@@ -195,7 +195,7 @@
 
         url = nextURL(jqXHR.getResponseHeader('Link'));
         quiz_submissions.push.apply(quiz_submissions, adata["quiz_submissions"]);
-        
+
         if (url) {
           getQuizSubmissions( url, courseId, quizId );
         }
@@ -217,7 +217,7 @@
             for ( var atmps=1;atmps<numAttempts; atmps++ ) {
                 let tmpUrl =  '/api/v1/courses/'+ courseId + '/quizzes/' + quizId + '/submissions/' +  tmpItem.id + '?attempt=' + atmps;
                 //console.log( "attempt url", tmpUrl );
-                
+
                 pending ++;
                 $.getJSON(tmpUrl, function (attemptData, status, jqXHR ) {
                   if (debug) console.log( "attemptAr:", attemptData["quiz_submissions"][0].id, attemptData["quiz_submissions"][0].time_spent,attemptData["quiz_submissions"][0].score  );
@@ -231,7 +231,7 @@
                   //console.log( "assign attemptAr:", attemptData["quiz_submissions"][0].id, newAtmps ) ;
                   attemptAr[ attemptData["quiz_submissions"][0].id ]["time_spent_"+newAtmps] = attemptData["quiz_submissions"][0].time_spent;
                   attemptAr[ attemptData["quiz_submissions"][0].id ]["score_"+newAtmps] = attemptData["quiz_submissions"][0].score;
-                  
+
                   pending--;
                   //fetched++;
                   //console.log( "pending:", pending  );
@@ -301,14 +301,14 @@
     return quizId;
   }
 
-  
+
   function makeReport( courseId, quizId ) { //generates CSV of data
     var csv;
     var quizTitle="";
     try {
         quizTitle=document.title.split( ":" )[0].replace(/[^\w]/g, "");
     } catch(e){}
-    
+
     try {
       if (aborted) {
         console.log('Process aborted');
@@ -323,7 +323,7 @@
         var blob = new Blob([csv], {
           'type': 'text/csv;charset=utf-8'
         });
-        
+
         var savename = 'course-' + courseId + '-quizSubmissions-' + quizTitle + '-' + today + '.csv';
           saveAs(blob, savename);
           $('#quiz-submissions-report').one('click', {
@@ -345,9 +345,9 @@ function createQuizSubmissionCSV() {
 
       console.log( "quiz_submissions:", quiz_submissions );
       console.log( "attemptAr", attemptAr  );
-      
+
     }
-    
+
     var fields = [
       'id',
       'sis_user_id',
@@ -409,7 +409,7 @@ function createQuizSubmissionCSV() {
             fields.push( "score_" + atmps  );
             titleAr.push( "time_spent_" + atmps );
             titleAr.push( "score_" + atmps  );
-            
+
         }
         fields.push( "average_time_spent" );
         titleAr.push( "average_time_spent" );
@@ -453,32 +453,36 @@ function createQuizSubmissionCSV() {
         if (debug) console.log( "quiz_submissions item:", item );
         // the student
         tmpId = item.user_id;
-        quizSubmissionReportAr[tmpId]['score'] = item['score'];
-        quizSubmissionReportAr[tmpId]['kept_score'] = item['kept_score'];
-        quizSubmissionReportAr[tmpId]['started_at'] = item['started_at'];
-        quizSubmissionReportAr[tmpId]["end_at"] = item['end_at'];
-        quizSubmissionReportAr[tmpId]["finished_at"] = item['finished_at'];
-        quizSubmissionReportAr[tmpId][ "attempt"] = item['attempt'];
-        
-        quizSubmissionReportAr[tmpId]["workflow_state"] = item['workflow_state'];
-       // quizSubmissionReportAr[tmpId]["fudge_points"] = item['fudge_points'];
-        //quizSubmissionReportAr[tmpId][ "quiz_points_possible"] = item['quiz_points_possible'];
-        //quizSubmissionReportAr[tmpId]["extra_attempts"] = item['extra_attempts'];
-        //quizSubmissionReportAr[tmpId][ "extra_time"] = item['extra_time'];
-        //quizSubmissionReportAr[tmpId]["manually_unlocked"] = item['manually_unlocked'];
-        //quizSubmissionReportAr[tmpId]["score_before_regrade"] = item['score_before_regrade'];
-        //quizSubmissionReportAr[tmpId]["has_seen_results"] = item['has_seen_results'];
-        quizSubmissionReportAr[tmpId]["time_spent"] = item['time_spent'];
-        //quizSubmissionReportAr[tmpId][ "attempts_left"] = item['attempts_left'];
-        //quizSubmissionReportAr[tmpId]["overdue_and_needs_submission"] = item['overdue_and_needs_submission'];
-        quizSubmissionReportAr[tmpId]["excused"] = item['excused'];
+        if (debug) console.log( "tmpId:", tmpId );
+        //tmpId = item.sis_user_id;
+        try{ 
+          quizSubmissionReportAr[tmpId]['score'] = item['score'];
+          quizSubmissionReportAr[tmpId]['kept_score'] = item['kept_score'];
+          quizSubmissionReportAr[tmpId]['started_at'] = item['started_at'];
+          quizSubmissionReportAr[tmpId]["end_at"] = item['end_at'];
+          quizSubmissionReportAr[tmpId]["finished_at"] = item['finished_at'];
+          quizSubmissionReportAr[tmpId][ "attempt"] = item['attempt'];
+
+          quizSubmissionReportAr[tmpId]["workflow_state"] = item['workflow_state'];
+        // quizSubmissionReportAr[tmpId]["fudge_points"] = item['fudge_points'];
+          //quizSubmissionReportAr[tmpId][ "quiz_points_possible"] = item['quiz_points_possible'];
+          //quizSubmissionReportAr[tmpId]["extra_attempts"] = item['extra_attempts'];
+          //quizSubmissionReportAr[tmpId][ "extra_time"] = item['extra_time'];
+          //quizSubmissionReportAr[tmpId]["manually_unlocked"] = item['manually_unlocked'];
+          //quizSubmissionReportAr[tmpId]["score_before_regrade"] = item['score_before_regrade'];
+          //quizSubmissionReportAr[tmpId]["has_seen_results"] = item['has_seen_results'];
+          quizSubmissionReportAr[tmpId]["time_spent"] = item['time_spent'];
+          //quizSubmissionReportAr[tmpId][ "attempts_left"] = item['attempts_left'];
+          //quizSubmissionReportAr[tmpId]["overdue_and_needs_submission"] = item['overdue_and_needs_submission'];
+          quizSubmissionReportAr[tmpId]["excused"] = item['excused'];
+        } catch(e){}
         //try to add first attempt and score
         try {
             //console.log( item.id, attemptAr[item.id], maxAtmps );
             if ( maxAtmps >1 ) {
                 let divNum = 1;
                 let timeSpent = 0;
-                
+
                 timeSpent = item['time_spent'];
                 for (let atmps=1;atmps<maxAtmps;atmps++) {
                    //console.log( "time_spent_"+atmps + " in attemptAr:", item.id, (( "time_spent_"+atmps ) in attemptAr[item.id]) )
@@ -500,15 +504,15 @@ function createQuizSubmissionCSV() {
                 try{
                     quizSubmissionReportAr[tmpId]["average_time_spent"]=timeSpent/divNum;
                 }catch(e){
-                    
+
                 }
-                
+
             }
-          
+
         } catch(e){}
     } // end for
 
-    if (1) console.log( "quizSubmissions:", quizSubmissionReportAr );
+    if (1) console.log( "quizSubmissions reportAr:", quizSubmissionReportAr );
     var CRLF = '\r\n';
 
 
@@ -615,7 +619,7 @@ function createQuizSubmissionCSV() {
             'value': 0
           });
           $('#jj_progress_dialog').dialog('open');
-          
+
         }
       } else {
         if (!aborted) {
@@ -626,7 +630,7 @@ function createQuizSubmissionCSV() {
     } catch (e) {
       errorHandler(e);
     }
-    
+
   }
   function resetData(){
     userData = {};
