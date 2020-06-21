@@ -9,7 +9,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/jszip.min.js
-// @version     0.4
+// @version     0.5
 // @grant       none
 // ==/UserScript==
 
@@ -50,6 +50,7 @@
   today = (yyyy-2000 ) + '-' + mm  + '-' + dd + '-' + Math.floor(Date.now() /1000) ;
   var aborted = false;
   addQuizEssayAnswersButton();
+  var ansId = 0;
 
   function addQuizEssayAnswersButton() {
 
@@ -262,19 +263,26 @@
     fetched = 0;
     let url = "";
     let tmpName= '';
-    for (var i=0; i<resultUrlArray.length;i++) {
-      pending++;
-      url = resultUrlArray[i][0];
-      tmpName = resultUrlArray[i][1];
-      if (debug) console.log( "in getQuizAnswerReport", url );
-      getQuizAnswers( url, courseId, quizId, tmpName );
+    getQuizAns();
+    //for (var i=0; i<resultUrlArray.length;i++) {
+    //  pending++;
+    //  url = resultUrlArray[i][0];
+    //  tmpName = resultUrlArray[i][1];
+    //  if (debug) console.log( "in getQuizAnswerReport", url );
+    //  getQuizAnswers( url, courseId, quizId, tmpName );
 
-    }
+    //}
   
     //makeReport( courseId, quizId );
 
   }
 
+  function getQuizAns(){
+    pending++;
+    let url = resultUrlArray[ansId][0];
+    let tmpName = resultUrlArray[ansId][1];
+    getQuizAnswers( url, courseId, quizId, tmpName );
+  }
 
   function getQuizAnswers( url, courseId, quizId, tmpName ) { //get answer data
     var tmpQuizSubmissions;
@@ -320,13 +328,17 @@
         zip.file( savename, totalAns ); 
         pending--;
         if (debug) console.log( "get quizAnswers pending:", pending );
-        if (pending <= 0 && !aborted) {
+        ansId+=1;
+        if (ansId>=resultUrlArray.length && !aborted) {
           makeReport( courseId, quizId );
+        }else{
+          getQuizAns();
         }
       }).fail(function () {
         pending--;
         fetched+=50;
         progressbar(fetched, needsFetched);
+        ansId+=1;
         if (!aborted) {
           console.log('Some report data failed to load');
         }
