@@ -321,6 +321,7 @@
     if (debug) console.log( "in timeRange:" );
 
     //try {
+    if ( jQuery('.assignment_dates') ){
         jQuery('.assignment_dates td').each( 
             function(){ 
                 a=jQuery(this).attr('data-html-tooltip-title'); 
@@ -332,6 +333,27 @@
                     timeRange.push( dateStr );
                 }
             } );
+        } 
+        if ( jQuery('#quiz_student_details') ) {
+            jQuery('#quiz_student_details .value').each( 
+                function(){ 
+                    a=jQuery(this).text(); 
+                    if ( a.indexOf(' - ') >0 ){
+                        if (debug) console.log( a );
+    
+                        let tmpAr = a.split( ' - ' );
+                        if ( tmpAr[0].indexOf( ' at ' ) >0 ) {
+                            let dateStr1 = tmpAr[0].split(' at')[0];
+                            timeRange.push( dateStr1.trim() );
+                        }
+                        if ( (tmpAr.length >1) &&  (tmpAr[1].indexOf( ' at' ) >0) ){
+                            let dateStr2 = tmpAr[1].split(' at')[0];
+                            timeRange.push( dateStr2.trim() );
+                        }
+                    }
+                } );
+
+        }
     //} catch (e) {
    ////   errorHandler(e);
     //}
