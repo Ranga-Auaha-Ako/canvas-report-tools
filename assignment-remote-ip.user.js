@@ -5,6 +5,7 @@
 // @description For Canvas users, this tool generates a .CSV download of student remote ip address during assignment time
 // @downloadURL https://github.com/clearnz/canvas-report-tools/raw/master/quiz-submissions-allattempts.user.js
 // @include     https://*/courses/*/assignments/*
+// @include     https://*/courses/*/quizzes/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
