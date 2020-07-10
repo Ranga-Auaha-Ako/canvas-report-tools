@@ -9,7 +9,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
-// @version     0.1
+// @version     0.2
 // @grant       none
 // ==/UserScript==
 
@@ -229,7 +229,7 @@
   function getStudentIp( ){
     
     let studentId = studentIdAr[ sIndex ];
-    let url = `/api/v1/users/${studentId}/page_views?start_time=${t1}&end_time=${t2}&per_page=50`;               
+    let url = `/api/v1/users/${studentId}/page_views?start_time=${t1}&end_time=${t2}&per_page=100`;               
     if (debug) console.log( "getStudentIp url:", url );
     getRemoteIp( url );
   }
@@ -256,10 +256,10 @@
               //store remote ip address to student user object
               for ( let i=0; i< tmpPageViewAr.length;i++ ){
                 if  ( tmpPageViewAr[i].remote_ip  ){
-                    if ( ! ( userData[ studentId ].remote_ip.includes( tmpPageViewAr[i].remote_ip  ) ) ) {
+                    //if ( ! ( userData[ studentId ].remote_ip.includes( tmpPageViewAr[i].remote_ip  ) ) ) {
                         userData[ studentId ].remote_ip.push( tmpPageViewAr[i].remote_ip  );
                         if (debug) console.log( "studentId, remoteIp:", studentId, tmpPageViewAr[i].remote_ip );
-                    }
+                    //}
                 }
                 
               }
@@ -448,6 +448,9 @@ function createRemoteIpCSV() {
         remoteIpReportAr[id]['sis_user_id'] = userData[id].sis_user_id;
         remoteIpReportAr[id]['login_id'] = userData[id].login_id;
         remoteIpReportAr[id]['name'] = userData[id].name;
+        let tmpIpAr = userData[id].remote_ip;
+        tmpIpAr = [...new Set(tmpIpAr)].sort() ;
+        userData[id].remote_ip = tmpIpAr;
         remoteIpReportAr[id]['remote_ip'] = userData[id].remote_ip.toString();
     }
    
@@ -576,6 +579,7 @@ function createRemoteIpCSV() {
   }
   function resetData(){
     userData = {};
+    studentIdAr = [];
     attemptAr = new Object();
     pending = - 1;
     fetched = 0;
