@@ -534,7 +534,7 @@ function createRemoteIpCSV() {
       if (typeof x === 'undefined' || typeof n == 'undefined') {
         if ($('#jj_progress_dialog').length === 0) {
           $('body').append('<div id="jj_progress_dialog"></div>');
-          $('#jj_progress_dialog').append('<div id="jj_progressbar"></div><small>It may take a few mins for large courses</small><br><small id="doing"></small>');
+          $('#jj_progress_dialog').append('<div id="jj_progressbar"></div><small>It may take a while for large courses</small><br><small id="doing"></small>');
           $('#jj_progress_dialog').dialog({
             'title': 'Fetching Report',
             'autoOpen': false,
