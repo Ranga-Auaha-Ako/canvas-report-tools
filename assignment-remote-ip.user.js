@@ -119,7 +119,7 @@
     courseId = getCourseId();
     //quizId = getQuizId();
     if (debug) console.log( courseId );
-    var url = '/api/v1/courses/' + courseId + '/sections?include[]=students&per_page=50';
+    var url = '/api/v1/courses/' + courseId + '/sections?include[]=students&include[]=email&per_page=50';
     progressbar();
     pending = 0;
     getStudents( url, courseId );
