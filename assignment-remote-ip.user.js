@@ -160,6 +160,7 @@
                       var splitname = user.sortable_name.split(',');
                       user.firstname = splitname[1].trim();
                       user.surname = splitname[0].trim();
+                    
                       user.remote_ip = [];
                       userData[user.id] = user;
                       studentIdAr.push( user.id );
@@ -456,6 +457,7 @@ function createRemoteIpCSV() {
         remoteIpReportAr[id]['sis_user_id'] = userData[id].sis_user_id;
         remoteIpReportAr[id]['login_id'] = userData[id].login_id;
         remoteIpReportAr[id]['name'] = userData[id].name;
+        remoteIpReportAr[id]['email'] = userData[id].email;
         let tmpIpAr = userData[id].remote_ip;
         tmpIpAr = [...new Set(tmpIpAr)].sort() ;
         userData[id].remote_ip = tmpIpAr;
