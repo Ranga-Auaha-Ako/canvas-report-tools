@@ -9,7 +9,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
-// @version     0.2.1
+// @version     0.2.2
 // @grant       none
 // ==/UserScript==
 
@@ -219,6 +219,9 @@
         }
     }
     if (debug) console.log( t1, t2 );
+    if (t1==t2){
+      t2 = t2 + " 23:59";
+    }
     sIndex = 0;
     jQuery("#doing").html( "Fetching Student remote ip information <img src='https://flexiblelearning.auckland.ac.nz/images/spinner.gif'/>" );
     getStudentIp( );
