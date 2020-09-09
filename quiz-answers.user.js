@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        Canvas quiz essay answer submission download
+// @name        Canvas quiz essay answer submission download for quantext analysis ( quantext.co.nz )
 // @author      WenChen Hol
 // @namespace   https://github.com/clearnz/canvas-report-tools/
 // @description For Canvas users, this tool generates a .CSV download of the quiz submissions information
