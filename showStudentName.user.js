@@ -2,7 +2,7 @@
 // @name        Show Override Names
 // @namespace   https://github.com/jamesjonesmath/canvancement
 // @description Show the names of the students who have an assignment override
-// @include     /^https://*/courses/[0-9]+/(assignments|quizzes|discussion_topics)/[0-9]+(\?|$)/
+// @include     /^https://.*/courses/[0-9]+/(assignments|quizzes|discussion_topics)/[0-9]+(\?|$)/
 // @version     2
 // @grant       none
 // ==/UserScript==
