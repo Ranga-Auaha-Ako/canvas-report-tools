@@ -99,8 +99,10 @@
         getAssignmentOverrides(courseId, url);
       }
       pending--;
-      if (pending <= 0) {
+      if (pending <= 0 && overrides.length>0) {
         getUsers(courseId);
+      } else {
+        $('#override').html( '' );
       }
     });
   }
@@ -162,7 +164,7 @@
 
             myProcess( );
 
-        }
+        } else{}
       }).fail(function () {
         pending--;
         throw new Error('Failed to load list of students');
