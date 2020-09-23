@@ -41,16 +41,7 @@
     //  return;
     //}
     //var isBeneficial = false;
-    var isBeneficial = true;
-    $(tableSelector + ' tr td:nth-child(2)')
-      .each(function(i, e) {
-        if (studentRegex.test(e.textContent)) {
-          isBeneficial = true;
-        }
-      });
-    if (!isBeneficial) {
-      return;
-    }
+  
     if ($(tableSelector).length ) {
       jQuery(overrideHtml).insertAfter(tableSelector);
     } else {
@@ -217,6 +208,7 @@
                 for (let j = 0; j <student_ids.length; j++) {
                     forStr += userData[ student_ids[ j ] ].name + ",";
                 }
+                forStr = forStr.slice(0, -1);
             } else {
                 forStr = overrides[i].title + '<br>';
                 forStr += sections[ overrides[i].course_section_id ].join(',');
@@ -241,8 +233,7 @@
   function excelDate(timestamp, allDate=0) {
     var d;
     const monthNames = ["January", "February", "March", "April", "May", "June",
-         "July", "August", "September", "October", "November", "December"
-        ];
+         "July", "August", "September", "October", "November", "December" ];
 
     try {
       if (!timestamp) {
