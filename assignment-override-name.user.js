@@ -2,7 +2,8 @@
 // @name        Show Assignment Override Names
 // @author      WenChen Hol
 // @namespace   https://github.com/clearnz/canvas-report-tools/
-// @description Show the names of the students who have an assignment override
+// @description Show assignment override infromation with student names
+// @downloadURL https://github.com/clearnz/canvas-report-tools/raw/master/assignment-override-name.user.js
 // @include     /^https://.*/courses/[0-9]+/(assignments|quizzes|discussion_topics)/[0-9]+(\?|$)/
 // @version     0.1
 // @grant       none
