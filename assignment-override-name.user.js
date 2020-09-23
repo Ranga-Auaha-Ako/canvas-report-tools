@@ -35,10 +35,11 @@
     if (assignmentType == 'discussion_topics') {
       tableSelector = 'table.discussion-topic-due-dates';
     }
-    if ($(tableSelector)
-      .length === 0) {
-      return;
-    }
+    //some quiz did not show the table ...
+    //if ($(tableSelector)
+    //  .length === 0) {
+    //  return;
+    //}
     //var isBeneficial = false;
     var isBeneficial = true;
     $(tableSelector + ' tr td:nth-child(2)')
@@ -50,7 +51,11 @@
     if (!isBeneficial) {
       return;
     }
-    jQuery(overrideHtml).insertAfter(tableSelector);
+    if ($(tableSelector).length ) {
+      jQuery(overrideHtml).insertAfter(tableSelector);
+    } else {
+      jQuery( '#content' ).append(overrideHtml);
+    }
     if (assignmentType === 'assignments') {
       getAssignment(courseId, assignmentId);
     } else {
