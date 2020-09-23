@@ -5,7 +5,7 @@
 // @description Show assignment override infromation with student names
 // @downloadURL https://github.com/clearnz/canvas-report-tools/raw/master/assignment-override-name.user.js
 // @include     /^https://.*/courses/[0-9]+/(assignments|quizzes|discussion_topics)/[0-9]+(\?|$)/
-// @version     0.2
+// @version     0.3
 // @grant       none
 // ==/UserScript==
 // based on code from James Jones' Canvancement https://github.com/jamesjonesmath/canvancement
