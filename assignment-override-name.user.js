@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        Show Assignment Override Names
+// @name        Show Assignment/Quiz/Discussion Override Student Names
 // @author      WenChen Hol
 // @namespace   https://github.com/clearnz/canvas-report-tools/
 // @description Show assignment override infromation with student names
