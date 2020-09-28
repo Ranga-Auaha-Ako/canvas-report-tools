@@ -211,7 +211,9 @@
                 forStr = forStr.slice(0, -1);
             } else {
                 forStr = overrides[i].title + '<br>';
-                forStr += sections[ overrides[i].course_section_id ].join(',');
+                try{
+                  forStr += sections[ overrides[i].course_section_id ].join(',');
+                }catch(e){}
             }
             if ( overrides[i].all_day && overrides[i].all_day_date!="" ){
               due = excelDate( overrides[i].due_at, 1 );
