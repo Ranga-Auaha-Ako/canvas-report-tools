@@ -2,7 +2,7 @@
 // @name        Canvas quiz answer/event timing/similarity information download
 // @author      WenChen Hol
 // @namespace   https://github.com/clearnz/canvas-report-tools/
-// @description For Canvas users, this tool generates a zip file download of the all quiz essay answers, for Turnitin to check for plagiarism
+// @description For Canvas users, this tool generates a spreadsheet file download of the all quiz answers, and time events of each choice/input, for similarity checking and remark purposes;
 // @downloadURL https://github.com/clearnz/canvas-report-tools/raw/master/quiz-time-answers-similarity.user.js
 // @include     https://*/courses/*/quizzes/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
