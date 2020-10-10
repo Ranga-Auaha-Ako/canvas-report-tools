@@ -9,7 +9,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/xlsx.full.min.js
-// @version     0.1
+// @version     0.2
 // @grant       none
 // ==/UserScript==
 
@@ -327,6 +327,7 @@
       $.getJSON(url, function (udata, status, jqXHR) {
         url = nextURL(jqXHR.getResponseHeader('Link'));
         let quizEvents = udata.quiz_submission_events;
+        let prevViewTime = '';
         if ( quizEvents.length==0 ) {
           //no events, go to collect next events
           ansId +=1;
@@ -367,33 +368,47 @@
           if (debugEvent) console.log( 'answerOptions:', answerOptions );
           for (var i = 0; i < quizEvents.length; i++) {
             let tmpEvent = quizEvents[i];
-            if ( tmpEvent.event_type=="question_answered" ){
+            if ( tmpEvent.event_type=="question_answered" || tmpEvent.event_type=="question_viewed"){
               let event_data = tmpEvent.event_data;
               let event_time = excelTime( tmpEvent.created_at );
               let tmpAnsText='';
+              
               //event_data.quiz_question_id: "924887",
               //"answer": "8495"
               for ( let j=0; j< event_data.length; j++ ){
                 //store event when answer is not null
                 if (debugEvent) console.log( 'event_data.answer', event_data[j].answer );
-                if ( event_data[j].answer && typeof(event_data[j].answer) != 'object' ){
-                  let quizId = event_data[j].quiz_question_id;
-                  if ( event_data[j].answer in answerOptions ) {
-                    tmpAnsText = answerOptions[ event_data[j].answer ];
-                  } else {
-                    tmpAnsText = stripHtml( event_data[j].answer );
-                  }
-
-                  let tmpObj = {};
-                  tmpObj.answer = tmpAnsText;
-                  tmpObj.time = event_time;
-                  if (!( quizId in userData[studentid].eventsAr ) ) {
-                    userData[studentid].eventsAr[quizId] = [];
-                  }
-                  //store the user quiz event
-                  userData[studentid].eventsAr[quizId].push( tmpObj );
+                if ( tmpEvent.event_type=="question_answered" ){
+                  if ( event_data[j].answer && typeof(event_data[j].answer) != 'object' ){
+                    let quizId = event_data[j].quiz_question_id;
+                    //if ( event_data[j].answer in answerOptions ) {
+                    //  tmpAnsText = answerOptions[ event_data[j].answer ];
+                    //} else {
+                     tmpAnsText = stripHtml( event_data[j].answer );
+                    //}
+                    
+                    let tmpObj = {};
+                    tmpObj.answer = tmpAnsText;
+                    tmpObj.time = event_time;
+                    if (!( quizId in userData[studentid].eventsAr ) ) {
+                      userData[studentid].eventsAr[quizId] = [];
+                    }
+                    //PUSH Question view time
+                    if ( prevViewTime !='' ){
+                      let tmpObj1 = {};
+                      tmpObj1.answer = 'view';
+                      tmpObj1.time = prevViewTime;
+                      userData[studentid].eventsAr[quizId].push( tmpObj1 );
+                    }
+                    //store the user quiz event
+                    userData[studentid].eventsAr[quizId].push( tmpObj );
+                  }  
+                } else {
+                  // event is page viewed
+                  prevViewTime = event_time;
+                  if (debug) console.log( "question_viewed time:", prevViewTime );
                 }
-
+                
               }
 
             }
@@ -809,6 +824,8 @@
           } else {
             tmpStr = `Q${k}:`+ questionAr[qid] ;
           }
+          
+          tmpEventObj[tmpStr]='';
           tmpTime =`Q${k} event time`;
           if ( userData[id].eventsAr[qid] && userData[id].eventsAr[qid].length>0 ){
             userData[id].eventsAr[qid].forEach(function(tmpEvent){
