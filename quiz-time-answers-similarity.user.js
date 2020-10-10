@@ -343,7 +343,7 @@
           if ( quizEvents[0].event_type=="submission_created" ){
             let quizData = quizEvents[0].event_data.quiz_data;
             if (debugEvent) console.log( 'quizData:', quizData );
-
+            prevViewTime = excelTime( quizEvents[0].created_at );
             for ( let m=0;m<quizData.length;m++){
               let tmpQuiz = quizData[m];
               // collect multiple choice options into answerOptions
