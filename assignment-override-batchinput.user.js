@@ -27,10 +27,10 @@
                 let a= jQuery(tmpInput);
                 let parent = a.parents( '.Container__DueDateRow-item');
                 let theLabel = parent.find('#assign-to-label');
-                let insertTextbox= `<textarea id='myImport${index}' style="margin-left:10px;border:1px solid red;width:10rem;" />`;
+                let insertTextbox= `<textarea id='myImport${index}' style="border:1px solid red;width:10rem;" />`;
                 
-                let importBtn = `<br><a id="importStudents${index}" style="float:right;" >import</a>`;
-                theLabel.append( `<div class='importWrapper' id='importWrapper${index}' style="float:right">`+ insertTextbox + importBtn + `</div>` );              
+                let importBtn = `<br><a id="importStudents${index}" style="margin-left:20px;" >import</a><br>`;
+                theLabel.append( `<div class='importWrapper' id='importWrapper${index}' style="margin:10px;float:right;clear:both">`+ importBtn + insertTextbox +  `</div>` );              
                 //to add onchanage function to textarea//
                 jQuery(`#importStudents${index}`).one('click', {index:index}, importStudents );
             });
