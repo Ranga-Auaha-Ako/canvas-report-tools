@@ -32,7 +32,7 @@
                 let importBtn = `<br><a id="importStudents${index}" style="margin-left:20px;" >import</a><br>`;
                 theLabel.append( `<div class='importWrapper' id='importWrapper${index}' style="margin:10px;float:right;clear:both">`+ importBtn + insertTextbox +  `</div>` );              
                 //to add onchanage function to textarea//
-                jQuery(`#importStudents${index}`).one('click', {index:index}, importStudents );
+                jQuery(`#importStudents${index}`).on('click', {index:index}, importStudents );
             });
         }
         
