@@ -6,36 +6,49 @@
 // @downloadURL https://github.com/clearnz/canvas-report-tools/raw/master/assignment-override-batchinput.user.js
 // @include     https://*/courses/*/quizzes/*/edit
 // @include     https://*/courses/*/assignments/*/edit
+// @include     https://*/courses/*/quizzes/new
+// @include     https://*/courses/*/assignments/new
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
-// @version     0.1
+// @version     0.2
 // @grant       none
 // ==/UserScript==
 (function() {
     'use strict';
+    jQuery('#overrides-wrapper').ready( 
+        function(){
+            //if (jQuery('#overrides-wrapper').length) {
+            //    jQuery('#overrides-wrapper').prepend( `<a id="inputAssistance" class="inputAssistance" style="float:right;" href="javascript:void(0)">toggle input assistance</a>` );
+            //}
+            if (jQuery('.ContainerDueDate').length) {
+                jQuery('.ContainerDueDate').append( `<p><button class="inputAssistance Button Button--add-row" type="button">toggle input assistance</button></p>` );
+            }
+            jQuery('.inputAssistance').on('click', toggleInput );
+        }
+    )
     
-    if (jQuery('#overrides-wrapper').length) {
-        jQuery('#overrides-wrapper').prepend( `<a id="inputAssistance" style="float:right;" href="javascript:void(0)">toggle input assistance</a>` );
-    }
-    jQuery('#inputAssistance').on('click', toggleInput );
     function toggleInput(){
-
+        let targetI = 0;
         if ( jQuery('.importWrapper').length>0 ){
             jQuery('.importWrapper').remove();
         } else {
             let inputAll = document.querySelectorAll('input.ic-tokeninput-input');
             inputAll.forEach(function( tmpInput, index ){
+                targetI=index;
                 let a= jQuery(tmpInput);
                 let parent = a.parents( '.Container__DueDateRow-item');
                 let theLabel = parent.find('#assign-to-label');
                 let insertTextbox= `<textarea id='myImport${index}' style="border:1px solid red;width:10rem;" />`;
                 
                 let importBtn = `<br><a id="importStudents${index}" style="margin-left:20px;" >import</a><br>`;
-                theLabel.append( `<div class='importWrapper' id='importWrapper${index}' style="margin:10px;float:right;clear:both">`+ importBtn + insertTextbox +  `</div>` );              
+                theLabel.append( `<div class='importWrapper' id='importWrapper${index}' style="overflow:auto;margin:10px;margin-right:-30px;float:right;clear:both">`+ importBtn + insertTextbox +  `</div>` );              
                 //to add onchanage function to textarea//
-                jQuery(`#importStudents${index}`).on('click', {index:index}, importStudents );
+                jQuery(`#importStudents${index}`).one('click', {index:index}, importStudents );
+
             });
+            jQuery(`#myImport${targetI}`).focus();
+
         }
-        
+        return false;
     } 
     
     function importStudents( e ){
