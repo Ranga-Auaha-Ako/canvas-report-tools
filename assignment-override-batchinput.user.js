@@ -9,7 +9,7 @@
 // @include     https://*/courses/*/quizzes/new
 // @include     https://*/courses/*/assignments/new
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
-// @version     0.3
+// @version     0.4
 // @grant       none
 // ==/UserScript==
 (function() {
@@ -42,8 +42,8 @@
     ) */
     jQuery('#overrides-wrapper').ready( 
         function(){
-            jQuery('#content').append( `<p><button class="inputAssistance Button Button--add-row" type="button">toggle input assistance</button></p>` );
-            jQuery('.inputAssistance').on('click', toggleInput );
+            jQuery('#content').append( `<div id="inputAssistDiv"><span class="inputAssistance Button Button--add-row" type="button"><img src='https://flexiblelearning.auckland.ac.nz/images/spinner.gif'/> Fetching student informaiton for input assistance</span></div>` );
+            //jQuery('.inputAssistance').on('click', toggleInput );
         }
     ) ;
     getStudents( studentsUrl, courseId );
@@ -251,6 +251,8 @@
                     nameChecked = 1;
                     checkDoubleName();
                 }
+                jQuery('#inputAssistDiv').html( `<button class="inputAssistance Button Button--add-row" type="button">toggle input assistance</button>` );
+                jQuery('.inputAssistance').on('click', toggleInput );
                 if (debug) console.log( "Students name loaded, repeated names:", repeatedNameAr );
             }
           }).fail(function () {
