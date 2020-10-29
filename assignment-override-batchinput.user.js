@@ -9,7 +9,7 @@
 // @include     https://*/courses/*/quizzes/new
 // @include     https://*/courses/*/assignments/new
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
-// @version     0.5
+// @version     0.6
 // @grant       none
 // ==/UserScript==
 (function() {
@@ -23,13 +23,15 @@
     var studentsLoaded = 0;
     var nameChecked = 0;
     var debug = 0;
+    var debugName = 1;
     var pending = - 1;
+    const timer = ms => new Promise(res => setTimeout(res, ms));
 
     //quizId = getQuizId();
     if (debug) console.log( courseId );
     var studentsUrl = '/api/v1/courses/' + courseId + '/sections?include[]=students&include[]=email&per_page=50';
-    
-    /* jQuery('#overrides-wrapper').ready( 
+
+    /* jQuery('#overrides-wrapper').ready(
         function(){
             //if (jQuery('#overrides-wrapper').length) {
             //    jQuery('#overrides-wrapper').prepend( `<a id="inputAssistance" class="inputAssistance" style="float:right;" href="javascript:void(0)">toggle input assistance</a>` );
@@ -38,10 +40,10 @@
                 jQuery('.ContainerDueDate').append( `<p><button class="inputAssistance Button Button--add-row" type="button">toggle input assistance</button></p>` );
             }
             jQuery('.inputAssistance').on('click', toggleInput );
-            
+
         }
     ) */
-    jQuery('#overrides-wrapper').ready( 
+    jQuery('#overrides-wrapper').ready(
         function(){
             jQuery('#content').append( `<div id="inputAssistDiv"><span class="inputAssistance Button Button--add-row" type="button"><img src='https://flexiblelearning.auckland.ac.nz/images/spinner.gif'/> Fetching student informaiton for input assistance</span></div>` );
             //jQuery('.inputAssistance').on('click', toggleInput );
@@ -49,7 +51,7 @@
     ) ;
     getStudents( studentsUrl, courseId );
 
-    
+
     function toggleInput(){
         let targetI = 0;
         if ( jQuery('.importWrapper').length>0 ){
@@ -61,10 +63,10 @@
                 let a= jQuery(tmpInput);
                 let parent = a.parents( '.Container__DueDateRow-item');
                 let theLabel = parent.find('#assign-to-label');
-                let insertTextbox= `<textarea id='myImport${index}' style="border:1px solid red;width:10rem;" />`;
-                
+                let insertTextbox= `<textarea id='myImport${index}' rows='8' style="border:1px solid red;width:10rem;" />`;
+
                 let importBtn = `<br><a id="importStudents${index}" style="margin-left:20px;" >import</a><br>`;
-                theLabel.append( `<div class='importWrapper' id='importWrapper${index}' style="overflow:auto;margin:10px;margin-right:-30px;float:right;clear:both">`+ importBtn + insertTextbox +  `</div>` );              
+                theLabel.append( `<div class='importWrapper' id='importWrapper${index}' style="overflow:auto;margin:10px;margin-right:-30px;float:right;clear:both">`+ importBtn + insertTextbox +  `</div>` );
                 //to add onchanage function to textarea//
                 jQuery(`#importStudents${index}`).on('click', {index:index}, importStudents );
 
@@ -73,15 +75,18 @@
 
         }
         return false;
-    } 
-    
-    function importStudents( e ){
+    }
+
+    async function importStudents( e ){
         let tmpIndex = e.data.index;
         let nameFound = 0;
         //console.log( 'importStudents:', tmpIndex );
         let tmpId = 'myImport'+ tmpIndex;
         let tmpInput = document.querySelectorAll('input.ic-tokeninput-input')[tmpIndex];
+        let tokenList = jQuery( jQuery('.ic-tokens')[tmpIndex] );
+
         let remainedAr = [];
+        let doubledAr = [];
         //console.log( tmpInput );
         if (!tmpInput){
             return;
@@ -94,19 +99,19 @@
         }
         let tmpLines = tmpStr.split('\n');
         //console.log( tmpLines, tmpLines.length );
-    
+
         let tmpSS ='';
         let tmpName = '';
         if ( tmpLines.length == 0 ){
             return;
-        } 
+        }
         for ( let i=0; i<tmpLines.length; i++ ){
-            //then 
+            //then
             nameFound = 0;
             tmpSS = '';
             tmpName = tmpLines[i].trim();
-            if (debug) console.log( 'tmpName:', tmpName )
-            
+            if (debugName) console.log( 'tmpName:', tmpName )
+
             if ( tmpName=='' ){
                 continue;
             }
@@ -116,10 +121,10 @@
                 if (debug) console.log( 'add with names loaded' );
                 // if there are multiple students of the same name tmpName
                 if ( repeatedNameAr.length>0 && (repeatedNameAr.indexOf(tmpName) >-1) ){
-                    remainedAr.push( tmpName );
+                    doubledAr.push( tmpName );
                     continue;
                 }
-                //if the line is not name, 
+                //if the line is not name,
                 if  ( nameAr.indexOf( tmpName )<0  ){
                     //find name with upi
                     if ( tmpName in loginAr ){
@@ -134,7 +139,8 @@
                 tmpSS = tmpName;
             }
 
-            
+            if (debugName) console.log( 'tmpSS:', tmpSS )
+
             if ( tmpSS=='' ){
                 continue;
             }
@@ -144,6 +150,8 @@
             eventClick.simulated = true;
             let eventKeyUp = new Event('keyup', { bubbles: true });
             eventKeyUp.simulated = true;
+            let eventBlur = new Event('blur', { bubbles: true });
+            eventBlur.simulated = true;
             let eventKeyDown = new KeyboardEvent("keydown", {
                 bubbles: true, cancelable: true, keyCode: 13
             });
@@ -157,30 +165,50 @@
             tmpInput.dispatchEvent(eventClick);
             tmpInput.dispatchEvent(eventKeyUp);
             tmpInput.dispatchEvent(eventKeyDown);
+            //await timer(500);
+            if ( tokenList.html().indexOf( tmpSS ) <0 ) {
+                console.log( tmpSS, " not Added" );
+                remainedAr.push( tmpSS );
+                await timer(2500);
+                //tmpInput.dispatchEvent(eventKeyUp);
+                //tmpInput.dispatchEvent(eventKeyDown);
+                //tmpInput.dispatchEvent(eventBlur);
+
+                
+            }
+            
+
+
         }
         //reset textarea;
 
-        jQuery('#'+tmpId).val(remainedAr.join('\n'));
+        jQuery('#'+tmpId).val(remainedAr.join('\n')+doubledAr.join('\n'));
         if ( remainedAr.length>0 ) {
-            let remainedStr = remainedAr.join(' ');
+            let remainedStr = remainedAr.join( ',' );
+            //alert( `Some students not added:${remainedStr}.\n Please input manually` ); 
+            //import again
+            importStudents(e);
+        }
+        if ( doubledAr.length>0 ) {
+            let doubledStr = doubledAr.join(' ');
             let tmpNameUpi = '';
-            for ( let i=0; i< remainedAr.length; i++ ) {
-                let tmpResult = getKeyByValue( loginIdAr, remainedAr[i] );
+            for ( let i=0; i< doubledAr.length; i++ ) {
+                let tmpResult = getKeyByValue( loginIdAr, doubledAr[i] );
                 tmpResult.sort();
                 for ( let j=0; j< tmpResult.length; j++ ){
                     //display name with upi
-                    tmpNameUpi += remainedAr[i] + '(' + tmpResult[j]+ ')\n';
+                    tmpNameUpi += doubledAr[i] + '(' + tmpResult[j]+ ')\n';
                 }
-                if (debug) console.log( tmpResult );
+                if (debugStudent) console.log( tmpResult );
             }
 
-            alert( ` students:${remainedStr} with the same name exist, please input manually:\n` + tmpNameUpi );
+            alert( ` students:${doubledStr} with the same name exist, please input manually:\n` + tmpNameUpi );
 
         }
 
         return false;
     }// end importStudents
-    
+
     function getCourseId() { //identifies course ID from URL
         var courseId = null;
         if (debug) console.log( "in getCourseId: window.location", window.location.href );
@@ -212,7 +240,7 @@
         }
         return url;
     } // end get nextURL
-    
+
     function getStudents( url, courseId ) { //cycles through the student list
         //try {
           if ( studentsLoaded || nameChecked ){
@@ -237,8 +265,8 @@
                         uoaIdAr[user.sis_user_id]= user.short_name;
                         //register name in nameAr
                         nameAr.push(  user.short_name );
-                        
-                          
+
+
                       } // end for
                   } // end if length>0
               } catch(e){ continue; }
@@ -267,9 +295,9 @@
     } // end getStudents
     function checkDoubleName(){
         nameChecked = 1;
-        
+
         const countName = nameAr =>
-            nameAr.reduce((a, b) => ({ 
+            nameAr.reduce((a, b) => ({
                 ...a,
                 [b]: (a[b] || 0) + 1
              }), {});
@@ -280,13 +308,13 @@
         if (debug){
             console.log( "countNameAr:", countNameAr );
             console.log( "duplicated names:", repeatedNameAr );
-        } 
+        }
     }
-    
+
     function getKeyByValue(object, value) {
         return Object.keys(object).filter(key => object[key] === value);
     }
-      
+
     function errorHandler(e) {
         console.log(e.name + ': ' + e.message);
     }
