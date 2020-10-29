@@ -9,13 +9,14 @@
 // @include     https://*/courses/*/quizzes/new
 // @include     https://*/courses/*/assignments/new
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
-// @version     0.4
+// @version     0.5
 // @grant       none
 // ==/UserScript==
 (function() {
     'use strict';
     var courseId = getCourseId();
     var loginIdAr = {};
+    var loginAr = {};
     var uoaIdAr = {};
     var nameAr = [];
     var repeatedNameAr = [];
@@ -121,8 +122,8 @@
                 //if the line is not name, 
                 if  ( nameAr.indexOf( tmpName )<0  ){
                     //find name with upi
-                    if ( tmpName in loginIdAr ){
-                        tmpSS = loginIdAr[ tmpName ];
+                    if ( tmpName in loginAr ){
+                        tmpSS = loginAr[ tmpName ];
                     } else if ( tmpName in uoaIdAr ){
                         tmpSS = uoaIdAr[ tmpName ];
                     }
@@ -231,6 +232,7 @@
                         var user = section.students[j];
                         //upiAr
                         loginIdAr[user.id+'-'+user.login_id] = user.short_name;
+                        loginAr[user.login_id] = user.short_name;
                         //studentIdAr
                         uoaIdAr[user.sis_user_id]= user.short_name;
                         //register name in nameAr
