@@ -199,7 +199,7 @@
                     //display name with upi
                     tmpNameUpi += doubledAr[i] + '(' + tmpResult[j]+ ')\n';
                 }
-                if (debugStudent) console.log( tmpResult );
+                if (debugName) console.log( tmpResult );
             }
 
             alert( ` students:${doubledStr} with the same name exist, please input manually:\n` + tmpNameUpi );
