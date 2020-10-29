@@ -23,7 +23,7 @@
     var studentsLoaded = 0;
     var nameChecked = 0;
     var debug = 0;
-    var debugName = 1;
+    var debugName = 0;
     var pending = - 1;
     const timer = ms => new Promise(res => setTimeout(res, ms));
 
