@@ -256,9 +256,11 @@
           let tmpSubmissionAr = adata;
 
           let url = nextURL(jqXHR.getResponseHeader('Link'));
-          
           //store submission Data
           for ( let i=0; i<tmpSubmissionAr.length;i++ ){
+              fetched +=1;
+              //progressbar(fetched, needsFetched);
+
               if  ( tmpSubmissionAr[i].submitted_at  ){
                   let submissionReportAr = {};
                   studentId = tmpSubmissionAr[i].user_id;
@@ -271,6 +273,14 @@
                     submissionReportAr['email'] = userData[studentId].email;
                     
                     submissionReportAr['created_at'] = excelDate( tmpSubmissionAr[i].submitted_at );
+                    submissionReportAr['submission_history'] = ''; 
+                    if ( "submission_history" in tmpSubmissionAr[i] ){
+                      for (let j=0; j< tmpSubmissionAr[i].submission_history.length; j++ ){
+                        let tmpDate = tmpSubmissionAr[i].submission_history[j].submitted_at;
+                        submissionReportAr['submission_history'] += excelDate( tmpDate ) + ' | ';
+                      }
+
+                    }
                     submissionAr.push( submissionReportAr );
 
                   } catch(e){
@@ -284,8 +294,7 @@
           } // end for
 
           if (url && !finishedTest) {
-            fetched+=100;
-            progressbar(fetched, needsFetched);
+            
             getSubmissions( url );
           } else {
             
@@ -360,7 +369,8 @@ function createSubmissionCSV() {
       'login_id',
       'name',
       'email',
-      'created_at'
+      'created_at',
+      'submission_history'
     ];
 
     //titleAr to store title for access code
@@ -371,7 +381,8 @@ function createSubmissionCSV() {
         'Username',
         'Display_Name',
         'Email',
-        'Submission time'
+        'Submission_time',
+        'Submission_history'
     ];
 
     //var pageviewReportAr=[];
@@ -475,7 +486,7 @@ function progressbar(x, n) {
       if (typeof x === 'undefined' || typeof n == 'undefined') {
         if ($('#jj_progress_dialog').length === 0) {
           $('body').append('<div id="jj_progress_dialog"></div>');
-          $('#jj_progress_dialog').append('<div id="jj_progressbar"></div><small>It may take a few mins for large courses</small><br><small id="doing"></small>');
+          $('#jj_progress_dialog').append('<!--div id="jj_progressbar"></!--div--><small>It may take a few mins for large courses</small><br><small id="doing"></small>');
           $('#jj_progress_dialog').dialog({
             'title': 'Fetching Report',
             'autoOpen': false,
