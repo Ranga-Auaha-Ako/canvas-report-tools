@@ -143,14 +143,16 @@
           //return if no students
           if ( i==0 && section.students===null ){
             
+                 
               pending--;
-              alert( "No student found" );
+              continue;
+              /*alert( "No student found" );
               $('#jj_progress_dialog').dialog('close');
               $('#quiz-essay-answers-report').one('click', {
                 type: 2
               }, quizEssayAnswersReport);
               resetData();
-              throw new Error('Failed to load list of students');
+              throw new Error('Failed to load list of students');*/
             
           }
           try {
