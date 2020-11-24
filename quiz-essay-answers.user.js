@@ -9,7 +9,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/jszip.min.js
-// @version     0.5
+// @version     0.6
 // @grant       none
 // ==/UserScript==
 
