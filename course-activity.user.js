@@ -243,7 +243,7 @@
           'type': 'text/csv;charset=utf-8'
         });
       
-          var savename = 'course-' + courseTitle + '-course-activity-report-' + today + '.csv';
+          var savename = courseTitle + '-course-activity-report-' + today + '.csv';
           saveAs(blob, savename);
           $('#jj_course_access_report').one('click', {
             type: 2
