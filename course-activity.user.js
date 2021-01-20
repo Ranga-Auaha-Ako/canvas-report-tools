@@ -8,7 +8,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
-// @version     0.2
+// @version     0.21
 // @grant       none
 // ==/UserScript==
 
@@ -389,7 +389,7 @@ function createOntaskCSV() {
           
           let ext = courseActivityAr[i]["contentName"].substr( courseActivityAr[i]["contentName"].lastIndexOf('.') + 1);
           console.log(ext);
-          if ( imageAr.includes( ext ) ){
+          if ( imageAr.includes( ext.toLowerCase() ) ){
             continue;
           }
         }
