@@ -8,7 +8,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
-// @version     0.1
+// @version     0.2
 // @grant       none
 // ==/UserScript==
 
@@ -304,6 +304,7 @@ function createOntaskCSV() {
     var tmpTitle;
     var punctRE = /[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-\.\/:;<=>?@\[\]^_`{|}~]/g;
     var spaceRE = /\s+/g;
+    var imageAr = [ "png", "jpg", "gif", "jpeg" ];
     //loop through userData
     /* for (var id in userData) {
 
@@ -383,6 +384,14 @@ function createOntaskCSV() {
         
         if ( !courseActivityAr[i]['id'] ){
           continue;
+        }
+        if ( courseActivityAr[i]["contentType"]=="attachment" ) {
+          
+          let ext = courseActivityAr[i]["contentName"].substr( courseActivityAr[i]["contentName"].lastIndexOf('.') + 1);
+          console.log(ext);
+          if ( imageAr.includes( ext ) ){
+            continue;
+          }
         }
         item = courseActivityAr[i];
        // if (debug) { console.log( userId, item ); }
