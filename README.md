@@ -6,8 +6,6 @@ quiz-answers.user.js: Canvas quiz essay answer submission download as excel file
 
 quiz-pageviews.user.js : Generate report about student pageviews information during online assignment/quiz time 
 
-quiz-pageviews.user.js : Report all attempts/score information for Canvas quiz
-
 quiz-time-answers-similarity.user.js : Report student all answer/event timing information; for teacher to compare similarity of quiz answered among students.
 
 course-activity.user.js: similear to Canvas 'Course activity' report, as some university set limited report time range or report not available for past courses.
