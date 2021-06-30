@@ -7,7 +7,7 @@
 // @include     https://*/courses/*/pages/*/edit
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
-// @version     0.1
+// @version     0.2
 // @grant       none
 // ==/UserScript==
 
@@ -18,14 +18,14 @@
   var modules = [];
   //
 
-  
+
   var pending = - 1;
   var fetched = 0;
   var ajaxPool;
   var courseId;
   var debug = 0;
   var moduleIndex = -1;
-  var breadCrumbCode=''; 
+  var breadCrumbCode='';
   var breadCrumbHead=`
   <div id="breadcrumbDiv">
     <div class="breadcrumb" style="float: left; margin: 0 2em 1em 0; padding: 1em; background: #eee; border-width: 1px; border-style: solid; border-color: #f5f5f5 #e5e5e5 #ccc; overflow: hidden;">
@@ -34,13 +34,13 @@
         </span>
     </div>
   </div>`;
- 
+
   var aborted = false;
   addGetBreadcrumbLink();
 
   function addGetBreadcrumbLink() {
 
-        
+
         generateBreadCrumbCode()
 
     return;
@@ -73,15 +73,15 @@
     }
   }
 
- 
+
   function generateBreadCrumbCode(e) { //gets the student list
     pending = 0;
     fetched = 0;
-   
+
     aborted = false;
     setupPool();
     courseId = getCourseId();
-    
+
     if (debug) console.log( courseId );
     //var url = '/api/v1/courses/' + courseId + '/discussion_topics/' + discussionId + "/view";
     //progressbar();
@@ -106,12 +106,12 @@
     return url;
   }
 
-  
+
   function getModules ( url ) { //cycles through student list
     pending = 0;
     fetched = 0;
     //needsFetched = Object.getOwnPropertyNames(userData).length;
-    
+
     pending++;
     $.getJSON(url, function (adata, status, jqXHR) {
         url = nextURL(jqXHR.getResponseHeader('Link'));
@@ -147,9 +147,9 @@
         } else{
             getModuleItems();
         }
-        
+
     } else{
-        //print out result 
+        //print out result
         if (debug) console.log( modules );
         //prepare the breadcrumb code
         genBreadCrumbCode();
@@ -160,7 +160,7 @@
           }, getBreadcrumb);
         }
     }
-  
+
   }
 
   function genBreadCrumbCode(){
@@ -195,11 +195,11 @@
             tmpNodes = tmpModule.items;
             //add module link
             resultHtml += `
-            <a style="max-width: 20%; white-space: nowrap; overflow: hidden; text-decoration: none; position: relative;" 
-            title="${tmpModule.name}" 
-            href="https://canvas.auckland.ac.nz/courses/${courseId}/modules/${tmpModule.id}" 
+            <a style="max-width: 20%; white-space: nowrap; overflow: hidden; text-decoration: none; position: relative;"
+            title="${tmpModule.name}"
+            href="https://canvas.auckland.ac.nz/courses/${courseId}/modules/${tmpModule.id}"
             data-api-endpoint="https://canvas.auckland.ac.nz/api/v1/courses/${courseId}/modules/${tmpModule.id}" data-api-returntype="Module">
-            <strong>${tmpModule.name}</strong></a> `; 
+            <strong>${tmpModule.name}</strong></a> `;
             for (let m=0;m<tmpNodes.length;m++){
                 if (m==pageAt){
                     resultHtml +=`
@@ -232,22 +232,22 @@
                                 tmpIconCode = '';
                         }
                         resultHtml +=`
-                        &nbsp;&gt; 
-                        
-                        <a style="max-width: 20%; white-space: nowrap; overflow: hidden; text-decoration: none; position: relative;" 
-                        title="${tmpNodes[m].title}" 
-                        href="${tmpNodes[m].html_url}" 
-                        data-api-endpoint="${tmpNodes[m].url}" 
+                        &nbsp;&gt;
+
+                        <a style="max-width: 20%; white-space: nowrap; overflow: hidden; text-decoration: none; position: relative;"
+                        title="${tmpNodes[m].title}"
+                        href="${tmpNodes[m].html_url}"
+                        data-api-endpoint="${tmpNodes[m].url}"
                         data-api-returntype="${tmpNodes[m].type}">
                         ${tmpIconCode}
-                        &nbsp;${tmpNodes[m].title} 
+                        &nbsp;${tmpNodes[m].title}
                         </a>
                         `;
                     } else {
                         resultHtml +=`
                         &nbsp;&gt; <span class='title locked_title'> ${tmpNodes[m].title}</span> `;
                     }
-                    
+
 
                 }
             }
@@ -259,7 +259,7 @@
   }
 
   function getItems(items_url) { //get peer review data
-    
+
     let tmpItem;
     let url;
     try {
@@ -268,23 +268,23 @@
       }
       pending++;
       if (debug) console.log( "get module item:", items_url  )
-      
+
       $.getJSON(items_url, function (adata, status, jqXHR) {
         //get participants:  id, display_name
         for ( var i=0; i < adata.length; i++ ) {
           tmpItem = adata[i];
           modules[ moduleIndex ]['items'].push( adata[i] );
         }
-        
-        //get views: userid, message 
-               
+
+        //get views: userid, message
+
         url = nextURL(jqXHR.getResponseHeader('Link'));
-        
+
         if (url) {
           getItems( url );
         }
         pending--;
-        
+
         if (debug) console.log( "pending:", pending  );
         if (pending <= 0 && !aborted) {
           // get next module
@@ -322,15 +322,21 @@
   function getBreadcrumb(){
     if (debug) console.log( { breadCrumbCode } );
     if ($('#breadcrumbCode').length === 0) {
-        $('body').append('<div id="breadcrumbCode"></div>');
-        jQuery( "#breadcrumbCode" ).html( breadCrumbCode );
-        jQuery('#breadcrumbCode').dialog( {
+        $('body').append('<div id="breadcrumbContainer"><div id="breadcrumbDiv"></div><textarea id="breadcrumbCode" style="width:95%;height:2px;"></textarea></div>');
+        jQuery( "#breadcrumbDiv" ).html( breadCrumbCode );
+        jQuery( "#breadcrumbCode" ).val( breadCrumbCode );
+        jQuery('#breadcrumbContainer').dialog( {
             title: 'Breadcrumb code copied to clipboard',
-            width: 600, 
+            width: 600,
             buttons: {
                 InsertBreadCrumb: function() {
                     insertBreadCrumb();
-                    $('#breadcrumbCode').dialog('close');
+                    $('#breadcrumbContainer').dialog('close');
+                },
+                CopyHtmlCode: function(){
+                    copyClipboard();
+                    $('#breadcrumbContainer').dialog('close');
+
                 }
               }
          }
@@ -342,16 +348,10 @@
       tinyMCE.execCommand('mceInsertContent', false, breadCrumbCode);
   }
   function copyClipboard() {
-    let el = document.getElementById('breadcrumbDiv');
-	let range = document.createRange();
-	range.selectNodeContents(el);
-	let sel = window.getSelection();
-	sel.removeAllRanges();
-	sel.addRange(range);
-	document.execCommand('copy');
-	alert("Contents copied to clipboard.");
-	return false;
-      
+    jQuery('#breadcrumbCode').focus();
+    jQuery('#breadcrumbCode').select();
+    document.execCommand('copy');
+
   }
 
 
