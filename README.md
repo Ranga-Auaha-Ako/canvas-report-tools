@@ -1,5 +1,6 @@
 # canvas-report-tools
 
+breadcrumb.user.js: for adding breadcrumbs in Canvas pages. enabled when edit page in module.
 peer-grading.user.js: for peer review report; the reviewed scores/reviewer-names for each assignmet. 
 
 quiz-answers.user.js: Canvas quiz essay answer submission download as excel file for quantext analysis ( quantext.co.nz )
