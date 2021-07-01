@@ -322,9 +322,9 @@
   function getBreadcrumb(){
     if (debug) console.log( { breadCrumbCode } );
     ///if ($('#breadcrumbCode').length === 0) {
-        $('body').append('<div id="breadcrumbContainer"><div id="breadcrumbDiv"></div><textarea id="breadcrumbCode" style="width:95%;height:2px;"></textarea></div>');
+        $('body').append('<div id="breadcrumbContainer"><div id="breadcrumbDiv"></div>');
         jQuery( "#breadcrumbDiv" ).html( breadCrumbCode );
-        jQuery( "#breadcrumbCode" ).val( breadCrumbCode );
+        //jQuery( "#breadcrumbCode" ).val( breadCrumbCode );
         jQuery('#breadcrumbContainer').dialog( {
             title: 'Breadcrumb code copied to clipboard',
             width: 600, 
@@ -332,11 +332,6 @@
                 InsertBreadCrumb: function() {
                     insertBreadCrumb();
                     $('#breadcrumbContainer').dialog('close');
-                },
-                CopyHtmlCode: function(){
-                    copyClipboard();
-                    $('#breadcrumbContainer').dialog('close');
-
                 }
               }
          }
