@@ -28,7 +28,7 @@
   var breadCrumbCode=''; 
   var breadCrumbHead=`
   <div id="breadcrumbDiv" style="clear:both">
-    <div class="breadcrumb" style="float: left; margin: 0 2em 1em 0; padding: 1em; background: #eee; border-width: 1px; border-style: solid; border-color: #f5f5f5 #e5e5e5 #ccc; overflow: hidden;">
+    <div class="breadcrumb" style="margin: 0 2em 1em 0; padding: 1em; background: #eee; border-width: 1px; border-style: solid; border-color: #f5f5f5 #e5e5e5 #ccc; overflow: hidden;">
         <span style="font-size: 10pt;">`;
   var breadCrumbEnd = `
         </span>
