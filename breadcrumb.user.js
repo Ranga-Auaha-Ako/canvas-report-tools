@@ -343,7 +343,7 @@
     let tmpContent = tinyMCE.activeEditor.getContent();
     
     //console.log( $t.find( "#breadcrumbContainer" ) );
-    if (tmpContent.indexOf('<div id="breadcrumbDiv">')>-1 ){
+    if (tmpContent.indexOf('<div id="breadcrumbDiv"')>-1 ){
       if (debug) console.log('previous breadcrumb exist');
       let selection = tinyMCE.activeEditor.dom.select('div[id="breadcrumbDiv"]')[0];
 
