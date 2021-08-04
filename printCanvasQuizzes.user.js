@@ -3,7 +3,7 @@
 // @namespace    https://github.com/sukotsuchido/CanvasUserScripts
 // @version      1.4
 // @description  Allows the user to print quizzes from the preview page.
-// @author       Chad Scott (ChadScott@katyisd.org), Wen customized for allowing quiz banks
+// @author       Chad Scott (ChadScott@katyisd.org)
 // @include      https://*/courses/*/quizzes/*/take?preview*
 // @include      https://*/courses/*/question_banks/*
 // @require      https://code.jquery.com/jquery-3.4.1.min.js
@@ -26,6 +26,7 @@
     });
     function allMatchQuestions(){
         jQuery("#questions").removeClass("brief");
+        jQuery( '.quiz-header p' ).hide();
         var allMatchQuestions = document.querySelectorAll("div.matching_question");
         for (var z = 0; z < allMatchQuestions.length; z++) {
             var options = allMatchQuestions[z].querySelector("select").options;
