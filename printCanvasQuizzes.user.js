@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Print Canvas Quiz
 // @namespace    https://github.com/sukotsuchido/CanvasUserScripts
-// @version      1.3
+// @version      1.2
 // @description  Allows the user to print quizzes from the preview page.
 // @author       Chad Scott (ChadScott@katyisd.org)
 // @include      https://*/courses/*/quizzes/*/take?preview*
@@ -25,6 +25,7 @@
         parent.appendChild(el);
     });
     function allMatchQuestions(){
+        jQuery("#questions").removeClass("brief");
         var allMatchQuestions = document.querySelectorAll("div.matching_question");
         for (var z = 0; z < allMatchQuestions.length; z++) {
             var options = allMatchQuestions[z].querySelector("select").options;
