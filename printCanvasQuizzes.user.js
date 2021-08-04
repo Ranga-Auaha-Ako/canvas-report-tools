@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         Print Canvas Quiz
 // @namespace    https://github.com/sukotsuchido/CanvasUserScripts
-// @version      1.2
+// @version      1.4
 // @description  Allows the user to print quizzes from the preview page.
-// @author       Chad Scott (ChadScott@katyisd.org)
+// @author       Chad Scott (ChadScott@katyisd.org), Wen customized for allowing quiz banks
 // @include      https://*/courses/*/quizzes/*/take?preview*
 // @include      https://*/courses/*/question_banks/*
 // @require      https://code.jquery.com/jquery-3.4.1.min.js
