@@ -3,7 +3,7 @@
 // @namespace    https://github.com/sukotsuchido/CanvasUserScripts
 // @version      0.1
 // @description  Allows the user to print quizzes from the preview page.
-// @author       Wen Hol customized to allow for quizbanks
+// @author        Wen Hol customized to allow for quizbanks
 // @include      https://*/courses/*/question_banks/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
@@ -28,7 +28,7 @@
     });
     var $tmpTable= $('<table id="tmpTable" />');
     var CRLF = '<br> \r\n';
-
+   
     var quizTitle = jQuery('.quiz-header').find('.displaying').text();
     var today = new Date();
     var dd = today.getDate();
@@ -42,7 +42,7 @@
         mm = '0' + mm;
     }
   //courseId = getCourseId();
- // quizId = getQuizId();
+ // quizId = getQuizId(); 
 
     today = (yyyy-2000 ) + '-' + mm  + '-' + dd + '-' + Math.floor(Date.now() /1000) ;
     function allMatchQuestions(){
@@ -105,7 +105,7 @@
             answerChoices[j].style.verticalAlign = "Top";
             answerChoices[j].style.borderTop = "none";
         }
-
+        
         //This hides the Submit Quiz footer - delete the /* */ comment tags to hide the footer.
         var formActions = document.querySelectorAll("div.alert,div.ic-RichContentEditor,div.rce_links");
         for (var h = 0; h < formActions.length; h++) {
@@ -129,10 +129,10 @@
         }
         jQuery( '#show_question_details' ).hide();
         //get all questions to table
-
+        
         jQuery('.question').each( function(){
            if ( jQuery(this).find('.question_text').text().trim() !=""){
-
+               
                 jQuery(this).find('.header').each( function(){
                     $tmpTable.append( "<tr><td>" + jQuery(this).text() + "</td></tr>" );
                 });
@@ -154,7 +154,7 @@
         jQuery('body').append( $tmpTable );
         var elt = document.getElementById('tmpTable');
         var wb = XLSX.utils.table_to_book(elt, { sheet: "sheet1" });
-
+       
         wb.Props = {
             Title: quizTitle,
             Subject:"",
@@ -168,6 +168,7 @@
 
       let savename = 'quizbank' + quizTitle + '-' + today + '.xlsx';
       saveAs(blob, savename);
+      jQuery('#tmpTable').remove();
      }
 
      function s2ab(s) {
