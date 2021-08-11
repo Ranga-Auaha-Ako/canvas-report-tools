@@ -1,5 +1,8 @@
 # canvas-report-tools
 
+
+canvasQuizzesExcel.user.js : export Canvas classic questionbanks into spreadsheet, for team to collaboratly work on questions in google doc or team document.
+
 breadcrumb.user.js: for adding breadcrumbs in Canvas pages. enabled when edit page in module. process/howto see this video https://www.youtube.com/watch?v=Qe6-S44KrVc
 
 peer-grading.user.js: for peer review report; the reviewed scores/reviewer-names for each assignmet. 
