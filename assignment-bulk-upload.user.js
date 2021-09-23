@@ -10,7 +10,7 @@
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://unpkg.com/xlsx/dist/xlsx.full.min.js
 // @require     https://raw.githubusercontent.com/gildas-lormeau/zip.js/master/dist/zip-fs-full.min.js
-// @version     0.1
+// @version     0.2
 // @grant       none
 // ==/UserScript==
 // based on code from James Jones' Canvancement https://github.com/jamesjonesmath/canvancement
@@ -793,7 +793,7 @@
     <span id="numFinished" style=""></span> / ${numbStudents} <br>
     `);
     for ( let i=1; i<studentsFromExcel.length; i++ ) {
-        if ( useUserId ){
+        //if ( useUserId ){
             //use canvas user_id
             tmpId = 'progress' +i ;
             tmpName = studentsFromExcel[i][0];
@@ -802,7 +802,7 @@
             <progress id="${tmpId}" max="100" value="0"> </progress></span><br>`;
             jQuery('#myProgress').append( progressHtml );
 
-        }
+        //}
     }
   }
 
