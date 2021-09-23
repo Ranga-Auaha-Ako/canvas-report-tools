@@ -10,7 +10,7 @@
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://unpkg.com/xlsx/dist/xlsx.full.min.js
 // @require     https://raw.githubusercontent.com/gildas-lormeau/zip.js/master/dist/zip-fs-full.min.js
-// @version     0.2
+// @version     0.1
 // @grant       none
 // ==/UserScript==
 // based on code from James Jones' Canvancement https://github.com/jamesjonesmath/canvancement
@@ -73,7 +73,8 @@
             </span>
             <form id="custom_upload_submissions_form" style="margin-top: 10px; display: none;" enctype="multipart/form-data" onsubmit="return false">
                 <div id="step1" style="font-size: 0.8em;">
-                <p>Step 1. Choose excel file(.xslx) with student information: <a href="https://flexiblelearning.auckland.ac.nz/temp/studentsample.xlsx" target="_new">example format</a> 
+                <p>Step 1. Choose excel file(.xslx) with student information: <a href="https://flexiblelearning.auckland.ac.nz/temp/studentsample.xlsx" target="_new">example using AUID </a>,
+                <a href="https://flexiblelearning.auckland.ac.nz/temp/studentsampleuserid.xlsx" target="_new">example(Canvas ID) </a> 
                 <input type="file" id="student-excel" name="student-excel">
                 </p>
                 </div>
