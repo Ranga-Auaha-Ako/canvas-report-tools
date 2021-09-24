@@ -10,7 +10,7 @@
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://unpkg.com/xlsx/dist/xlsx.full.min.js
 // @require     https://raw.githubusercontent.com/gildas-lormeau/zip.js/master/dist/zip-fs-full.min.js
-// @version     0.2
+// @version     0.3
 // @grant       none
 // ==/UserScript==
 // based on code from James Jones' Canvancement https://github.com/jamesjonesmath/canvancement
@@ -100,6 +100,7 @@
                     </div>
                 </div>
             </form>
+            <div id="failedDiv"  style="font-size: x-small;"></div>
             <div id="myProgress" style="font-size: x-small;">
             </div>
             `
@@ -452,8 +453,19 @@
     for ( let i=1; i<studentsFromExcel.length; i++ ) {
         let tmpFile = studentsFromExcel[i][2];
         if ( ! fileNameArray.includes( tmpFile ) ){
+            let tmpFound = false;
+            //double check in case teacher forgot to provide file extension
+            for (let m=0; m<fileNameArray.length; m++){
+              if ( fileNameArray[m].indexOf( tmpFile )==0 ){
+                tmpFound = true;
+                studentsFromExcel[i][2] = fileNameArray[m];
+                break;
+              }
+            }
+            if ( !tmpFound ) {
+              missingFiles.push( studentsFromExcel[i][0] +"("+ tmpFile + ")" );
+            }
             
-            missingFiles.push( studentsFromExcel[i][0] +"("+ tmpFile + ")" );
         }
     } 
     if ( missingFiles.length> 0 ) {
@@ -482,10 +494,7 @@
     window.onbeforeunload = confirmExit;
     displayStudentProgressList();
     uploadFile( );
-    //for ( let i=1; i<studentsFromExcel.length;i++){
     
-        //uploadFile( 1 );
-    //}
   
   }
 
@@ -582,21 +591,24 @@
           }
         }).fail(function() {
           if (debug) console.log( tmpUrl + " upload process error" );
-          //jQuery( '#progress' + targetI ).css( {"background-color": "red"} );
-          jQuery( '#progress' + targetI ).addClass('Button--danger');
+          failedProcess( targetI, "upload process error" );
+          
           nextUpload();
         });
         
       } // end targetI check
   } // end function uploadFile
-
- 
+  
+  function failedProcess( i, message ){
+    jQuery( '#progress' + i ).after( message + "<br>" );
+    jQuery( '#containerprogress' + i ).addClass('Button--danger');
+    jQuery('#containerprogress' + i ).clone().appendTo("#failedDiv");
+  }
   async function uploadFileStep2( udata, targetFile ){
         if (! targetFile ){
           if (debug) console.log( 'targetFile not exist'  );
-          //jQuery( '#progress' + targetI ).css( {"background-color": "red"} );
-          jQuery( '#progress' + targetI ).after( "file not exist" );
-          jQuery( '#containerprogress' + targetI ).addClass('Button--danger');
+          failedProcess( targetI, "file not exist" );
+          
           nextUpload();
           return false;
           
@@ -621,9 +633,8 @@
           formData1.append('file', tmpData );
         } catch(e){
           if (debug) console.log( retJson['upload_params']['filename'], ' not exist'  );
-          //jQuery( '#progress' + targetI ).css( {"background-color": "red"} );
-          jQuery( '#progress' + targetI ).after( "file issue" );
-          jQuery( '#containerprogress' + targetI ).addClass('Button--danger');
+          failedProcess( targetI, "file issue" );
+          
           nextUpload();
           return false;
         }
@@ -651,9 +662,8 @@
         }).fail(
           function() {
             if (debug) console.log( uploadUrl + " upload process error" );
-            //jQuery( '#progress' + targetI ).css( {"background-color": "red"} );
-            jQuery( '#progress' + targetI ).after( "file upload error" );
-            jQuery( '#containerprogress' + targetI ).addClass('Button--danger');
+            failedProcess( targetI, "file upload error" );
+            
             nextUpload();
             //doing=0;
             //targetI +=1;
@@ -691,11 +701,8 @@
     }
     
     if ( file_id=="" || tmpId==""){
+      failedProcess( targetI, "empty auid or empty file_id" );
       
-      if (debug) console.log( "empty auid or empty file_id for target index:", targetI  );
-      //upload next one
-      //jQuery( '#progress' + targetI ).css( {"background-color": "red"} );
-      jQuery( '#containerprogress' + targetI ).addClass('Button--danger');
       nextUpload();
       //targetI +=1;
       //uploadFile();
@@ -750,10 +757,8 @@
           }
       }).fail(function() {
           if (debug) console.log( "step 3 POST process error for target index:", targetI );
-          
-          //jQuery( '#progress' + targetI ).after( "update assignment error" );
-          jQuery( '#progress' + targetI ).css( {"background-color": "red"} );
-          jQuery( '#containerprogress' + targetI ).addClass('Button--danger');
+          failedProcess( targetI, "update assignment error" );
+
           formData = null;
           nextUpload();
           //targetI +=1;
