@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name        Canvas media assignment submissions download
 // @author      WenChen Hol
-// @namespace   https://github.com/clearnz/canvas-report-tools/
+// @namespace   https://github.com/Ranga-Auaha-Ako/canvas-report-tools/
 // @description Show assignment override infromation with student names
-// @downloadURL https://github.com/clearnz/canvas-report-tools/raw/master/media-assignment-download.user.js
+// @downloadURL https://github.com/Ranga-Auaha-Ako/canvas-report-tools/raw/master/media-assignment-download.user.js
 // @include     https://*/courses/*/assignments/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
