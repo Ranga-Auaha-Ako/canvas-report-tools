@@ -1,5 +1,7 @@
 # canvas-report-tools
 
+Canvas assignment score,comment import script: for assignment grade, comment import. Some teachers may use external tools for the marking and feedback. This script help import grade and comment into Canvas gradebook.
+
 course-progress.user.js: for module progress report 
 
 canvasQuizzesExcel.user.js : export Canvas classic questionbanks into spreadsheet, for team to collaboratly work on questions in google doc or team document.
