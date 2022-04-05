@@ -498,6 +498,7 @@
   function doUpdate(){
     // confirm before proceeding
     if (debug) console.log( 'now doing update score call' );
+     $("#comments_dialog").dialog('close');
     if ( requests.length >0 ){
       confirm(
         `You are about to post ${requests.length} new score and comments.  Are you sure you wish to proceed?`,
@@ -546,6 +547,7 @@
         });
     } else {
       alert( 'All old record. Nothing to do!' );
+      $("#comments_dialog").dialog('close');
     }
   } // end doUpdate
 
