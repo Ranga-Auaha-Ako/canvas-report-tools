@@ -57,9 +57,8 @@
   courseId = getCourseId();
   // build requests
   var requests = [];
-
+  
   today = (yyyy-2000 ) + '-' + mm  + '-' + dd + '-' + Math.floor(Date.now() /1000) ;
-  addSubmissionUploadButton();
   getUserSubmissionInfo( courseId );
 
  var saveText = (function () {
@@ -78,10 +77,10 @@
 
   function addSubmissionUploadButton() {
 
-
+    
 
     if ($('#assignment-commentImport').length === 0) {
-
+        
         $('#sidebar_content').append(
             `<span><a href="javascript:void(0)" id="assignment-commentImport" class="ui-corner-all" role="menuitem">
                 <i class="icon-analytics"></i> Bulk upload score and comment</a>
@@ -89,7 +88,7 @@
             <form id="custom_upload_submissions_form" style="margin-top: 10px; display: none;" enctype="multipart/form-data" onsubmit="return false">
                 <div style="padding-top:10px">
                     <label for="comments_file">Import comments file: <a href="https://flexiblelearning.auckland.ac.nz/temp/gradecommentsample.csv" download title="with at least 3 columns 'Score', 'Comment' and an identifier column of either ID/UPI/SIS USER ID">sample csv file</a>
-
+                    
                     </label>
                     <input class="btn" type="file" id="comments_file"/>
                 </div>
@@ -103,14 +102,14 @@
             `
             );
 
-
-
+        
+                
         $('#assignment-commentImport').one('click', {
         type: 2
         }, showCommentImportForm );
     }
-
-
+      
+    
 
     return;
   }
@@ -162,7 +161,7 @@
     fetched = 0;
     aborted = false;
     setupPool();
-
+    
     //progressbar();
     pending = 0;
     //courseId = getCourseId();
@@ -174,8 +173,8 @@
         return;
     }
     await showUploadCommentForm( );
-
-
+    
+   
   }
 
   function getCourseId() { //identifies course ID from URL
@@ -212,7 +211,7 @@
   }
 
   function getUserSubmissionInfo(courseId) {
-
+    
     if ( debug ) console.log('in getUsers');
     var chunkSize = 100;
     var chunk;
@@ -221,12 +220,12 @@
     //var n = userList.length;
     pending = 0;
     url = '/api/v1/courses/' + courseId + '/sections?include[]=students&include[]=email&per_page=100';
-
+    
     getStudents( url, courseId );
-
+    
   }
 
-
+    
     function popUp(text) {
         $("#comments_dialog").html(`<p>${text}</p>`);
         $("#comments_dialog").dialog('open');
@@ -258,9 +257,9 @@
                         upiArray.push(''+user.login_id);
                     } // end for
                 } // end if length>0
-
+                
             } catch(e){ continue; }
-
+          
         }
         if (debug) console.log( {userData},{userDataUserId},{upiDataUserId} );
         if (debug) console.log( {studentIdArray},{userIdArray},{upiArray} );
@@ -275,6 +274,7 @@
         if (pending <= 0) {
 
             //showUploadCommentForm( );
+          addSubmissionUploadButton();
 
         } else{}
       }).fail(function () {
@@ -286,7 +286,7 @@
       pending--;
       $('#jj_progress_dialog').dialog('close');
       throw new Error('Failed to load list of students');
-
+      
     }
   }
   function confirm(text, callback) {
@@ -310,7 +310,7 @@
     let tmpToAdd = 0;
     score = parseInt(score);
     $.getJSON(tmpUrl, function (udata, status, jqXHR) {
-
+      
         let tmpSubmission = udata;
         if (debug) console.log( {student}, "graded at:", udata.graded_at );
         if (debug) console.log( "score:", udata.score, {score} );
@@ -319,7 +319,7 @@
           let tmpScore = udata.score;
           if ( tmpScore!= parseInt( score ) ){
             tmpToAdd = 1;
-
+            
           } else {
             let submissionComments = udata.submission_comments;
             if (debug) console.log("submission comment length:", submissionComments.length);
@@ -337,14 +337,14 @@
               }
             }
           }
-
+          
         } else {
           tmpToAdd = 1;
           if (debug) console.log( "graded at: empty"  );
         }
-
+        
         pending--;
-
+        
         if (debug) console.log( {tmpToAdd} );
         if ( tmpToAdd ){
             requests.push({
@@ -357,10 +357,10 @@
                     data: {
                       "comment[text_comment]": comment
                       ,"submission[posted_grade]":score
-                    },
+                    }, 
                     // to include submission[posted_grade]: score, for the import
-                    dataType: "json"
-                    //dataType: "text"
+                    dataType: "json" 
+                    //dataType: "text" 
                     },
                 error: `Failed to post comment for student ${student} and assignment ${assignmentId} using endpoint ${subUrl}. Response: `
             });
@@ -381,16 +381,16 @@
         }
         //return 1;
       } )
-
-
+    
+    
   }
-
+ 
   async function showUploadCommentForm(){
     //studentInfo to record student name/Auid/fileName
     var studentInfo;
     if (debug) console.log( 'in showUploadCommentForm' );
     jQuery('#custom_upload_submissions_form').show();
-    //read student file name information from the excel file
+    //read student file name information from the excel file 
     $('#comments_file').change(async function(evt) {
         $("#comments_file").hide();
         // parse CSV
@@ -405,7 +405,7 @@
                 var data = results.data;
                 if ( debug ) console.log({data});
                 var referral = ' Visit <a href="https://oit.colorado.edu/services/teaching-learning-applications/canvas/enhancements-integrations/enhancements#oit" target="_blank">Canvas - Enhancements</a> for formatting guidelines.';
-                if (data.length < 1) {
+                if (data.length < 1) { 
                     popUp("ERROR: File should contain a header row and at least one data row." + referral);
                     $("#comments_file").show();
                     return;
@@ -432,23 +432,23 @@
                     $("#comments_file").show();
                     return;
                 }
-
+                
                 if (Object.keys(data[0]).length < 3) {
                     popUp("ERROR: Header row should have 3 columns( 1: 'ID' or 'SIS User ID' or 'UPI' column, 2:'Score', 3: 'comment'  )" + referral);
                     $("#comments_file").show();
                     return;
                 }
 
-
+                
                 let dataLength = data.length;
-
+                
                 pending = 0;
                 popUp("<img src='https://flexiblelearning.auckland.ac.nz/images/spinner.gif'/> Determing what records need to be updated ..." );
                 for (const row of data) {
                     // to get student id, as teacher could use 'upi' or 'sis user id' as first field
-
+                    
                     if (debug) console.log( {dataLength} );
-
+                    
                     let student = '';
                     let tmpUpi = '';
                     let tmpSISid = '';
@@ -458,13 +458,13 @@
                        student = ''+ row["id"];
                     } else if ( tmpKeys.includes('upi') && upiArray.includes( ''+ row["upi"] ) ) {
                        tmpUpi = ''+ row["upi"];
-
+                       
                     } else if ( tmpKeys[0].includes('sis user id') &&  studentIdArray.includes( ''+row["sis user id"] ) ) {
                        tmpSISid = ''+ row["sis user id"];
-
+                       
                     }  else if ( tmpKeys.includes('sis login id') && upiArray.includes( ''+ row["sis login id"] ) ) {
                        tmpUpi = ''+ row["sis login id"];
-
+                       
                     }
                     comment  = row['comment'];
                     score = row['score'];
@@ -478,19 +478,19 @@
                     //to check if record is the same, then no action required
                     let checkSubmissionUrl = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${student}?include[]=submission_comments`;
                     let subUrl = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${student}`;
-
+                    
                     pending +=1;
                     await compareSubmission( checkSubmissionUrl, score, comment, student, subUrl);
-
-
-
-
-
+                    
+                    
+                    
+                    
+                    
                 } // end for
 
             }// end papa parse
-
-
+            
+            
         });
     }); // end comment_file change
   }
@@ -558,20 +558,20 @@
             $("#comments_progress").dialog("open");
         }
     }
+  
+  
 
+ 
+  
+  
 
+  
+ 
+  
 
+  
 
-
-
-
-
-
-
-
-
-
-
+  
 
   function displayStudentProgressList(){
     let tmpId;
@@ -597,9 +597,9 @@
     }
   }
 
+  
 
-
-
+  
 
   function resetData(){
     userData = {};
@@ -611,15 +611,15 @@
     pending = - 1;
     fetched = 0;
     needsFetched = 0;
-
+  
   }
 
-
+  
   function errorHandler(e) {
     $('#override').html( '' );
     console.log(e.name + ': ' + e.message);
   }
-
+  
   function confirmExit() {
         return "Upload process still going. Are you sure you want to exit?";
   }
