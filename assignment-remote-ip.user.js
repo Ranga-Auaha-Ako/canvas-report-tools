@@ -9,7 +9,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
-// @version     0.3
+// @version     0.3.1
 // @grant       none
 // ==/UserScript==
 
@@ -65,7 +65,7 @@
           //      '<li><a href="javascript:void(0)" id="remote-ip-report" class="ui-corner-all" role="menuitem"><i class="icon-analytics"></i> Student remote ip information Download</a></li>'
           //      );
           //} else {
-            $('#sidebar_content').append(
+            $('#right-side-wrapper').append(
                 '<span><a href="javascript:void(0)" id="remote-ip-report" class="ui-corner-all" role="menuitem"><i class="icon-analytics"></i> Student remote ip information Download</a></span>'
                 );
             
