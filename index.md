@@ -1,37 +1,33 @@
-## Welcome to GitHub Pages
+# canvas-report-tools
 
-You can use the [editor on GitHub](https://github.com/Ranga-Auaha-Ako/canvas-report-tools/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+Canvas assignment score,comment import script: for assignment grade, comment import. Some teachers may use external tools for the marking and feedback. This script help import grade and comment into Canvas gradebook.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+course-progress.user.js: for module progress report 
 
-### Markdown
+canvasQuizzesExcel.user.js : export Canvas classic questionbanks into spreadsheet, for team to collaboratly work on questions in google doc or team document.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+breadcrumb.user.js: for adding breadcrumbs in Canvas pages. enabled when edit page in module. process/howto see this video https://www.youtube.com/watch?v=Qe6-S44KrVc
 
-```markdown
-Syntax highlighted code block
+peer-grading.user.js: for peer review report; the reviewed scores/reviewer-names for each assignmet. 
 
-# Header 1
-## Header 2
-### Header 3
+quiz-essay-answers.user.js: Canvas quiz essay answer submission download for Turnitin plagiarism check. https://remotelearning.auckland.ac.nz/assessments/canvas-quiz-assignment/turnitin/
 
-- Bulleted
-- List
+quiz-answers.user.js: Canvas quiz essay answer submission download as excel file for quantext analysis ( quantext.co.nz )
 
-1. Numbered
-2. List
+quiz-pageviews.user.js : Generate report about student pageviews information during online assignment/quiz time 
 
-**Bold** and _Italic_ and `Code` text
+quiz-time-answers-similarity.user.js : Report student all answer/event timing information; for teacher to compare similarity of quiz answered among students.
 
-[Link](url) and ![Image](src)
-```
+course-activity.user.js: similear to Canvas 'Course activity' report, as some university set limited report time range or report not available for past courses.
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+discussion-download.user.js: Download Canvas discussion entries.
 
-### Jekyll Themes
+assignment-submission-time.user.js: Genate students assignment all submission history informaton.
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Ranga-Auaha-Ako/canvas-report-tools/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+assignment-remote-ip.user.js: Generate the remote ip addresses each student used during quiz/assignment time; for detecting contract cheating or use illigial service etc issues.
 
-### Support or Contact
+assignment-override-name.user.js: Show Assignment/Quiz/Discussion Override Student Names in assignment page ( as Canvas shows only section name or how many students, that make exam office or teacher to assign different time range for groups of students.
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+assignment-override-batchinput.user.js : add an extra input box for quiz/assignment, allow teacher/eaxm officer to batch copy student-names,canvas-id or upi and batch insert into assignment override field. ( instead of adding one name at a time )
+
+OnTask Reporter Tools.user.js : generate student access report for porting into OnTask tool (https://github.com/abelardopardo/ontask_b )
