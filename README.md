@@ -1,5 +1,5 @@
 # canvas-report-tools
-screen captures and description of each script, see the google doc below.
+screen captures and description of each script, see the google doc here
 https://docs.google.com/document/d/1dmobz9ydJ862uUyFe8feYz5wceqBu4u-WDUTeKxWKd0/
 
 Canvas assignment score,comment import script: for assignment grade, comment import. Some teachers may use external tools for the marking and feedback. This script help import grade and comment into Canvas gradebook.
