@@ -9,12 +9,12 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
-// @version     0.3.1
+// @version     0.4
 // @grant       none
 // ==/UserScript==
 
 // based on code from James Jones' Canvancement https://github.com/jamesjonesmath/canvancement
-// sample page_view API /api/v1/users/ssid/page_views?start_time=1%20Jun&end_time=1%20Jul 
+// sample page_view API /api/v1/users/ssid/page_views?start_time=1%20Jun&end_time=1%20Jul
 (function () {
   'use strict';
   var userData = {
@@ -65,13 +65,13 @@
           //      '<li><a href="javascript:void(0)" id="remote-ip-report" class="ui-corner-all" role="menuitem"><i class="icon-analytics"></i> Student remote ip information Download</a></li>'
           //      );
           //} else {
-            $('#right-side-wrapper').append(
+            $('#sidebar_content').append(
                 '<span><a href="javascript:void(0)" id="remote-ip-report" class="ui-corner-all" role="menuitem"><i class="icon-analytics"></i> Student remote ip information Download</a></span>'
                 );
-            
+
           //}
-          
-               
+
+
           $('#remote-ip-report').one('click', {
             type: 2
           }, remoteIpReport);
@@ -89,7 +89,7 @@
     ajaxPool = [
     ];
   }
-  
+
   function setupPool() {
     try {
       ajaxPool = [
@@ -160,7 +160,7 @@
                       var splitname = user.sortable_name.split(',');
                       user.firstname = splitname[1].trim();
                       user.surname = splitname[0].trim();
-                    
+
                       user.remote_ip = [];
                       userData[user.id] = user;
                       studentIdAr.push( user.id );
@@ -226,14 +226,14 @@
     sIndex = 0;
     jQuery("#doing").html( "Fetching Student remote ip information <img src='https://flexiblelearning.auckland.ac.nz/images/spinner.gif'/>" );
     getStudentIp( );
-    
+
 
   }
 
   function getStudentIp( ){
-    
+
     let studentId = studentIdAr[ sIndex ];
-    let url = `/api/v1/users/${studentId}/page_views?start_time=${t1}&end_time=${t2}&per_page=100`;               
+    let url = `/api/v1/users/${studentId}/page_views?start_time=${t1}&end_time=${t2}&per_page=100`;
     if (debug) console.log( "getStudentIp url:", url );
     getRemoteIp( url );
   }
@@ -255,7 +255,7 @@
             progressbar(fetched, needsFetched);
             $.getJSON(ssPageViewUrl, function (adata, status, jqXHR) {
               let tmpPageViewAr = adata;
-      
+
               let url = nextURL(jqXHR.getResponseHeader('Link'));
               //store remote ip address to student user object
               for ( let i=0; i< tmpPageViewAr.length;i++ ){
@@ -265,16 +265,16 @@
                         if (debug) console.log( "studentId, remoteIp:", studentId, tmpPageViewAr[i].remote_ip );
                     //}
                 }
-                
+
               }
-      
+
               if (url) {
                 getRemoteIp( url );
               } else {
                 sIndex+=1;
                 fetched+=1;
                 progressbar(fetched, needsFetched);
-                
+
                 if (debug) console.log( "sIndex:", sIndex  );
                 if (sIndex < studentIdAr.length && !aborted) {
                     getStudentIp( );
@@ -299,7 +299,7 @@
     } else {
         //generate the report
     }
-    
+
   }
 
   function getCourseId() { //identifies course ID from URL
@@ -319,16 +319,16 @@
     return courseId;
   }
 
-  function getTimeRange() {  
+  function getTimeRange() {
     let timeRange = [];
     let a="";
     if (debug) console.log( "in timeRange:" );
 
     //try {
     if ( jQuery('.assignment_dates') ){
-        jQuery('.assignment_dates td').each( 
-            function(){ 
-                a=jQuery(this).attr('data-html-tooltip-title'); 
+        jQuery('.assignment_dates td').each(
+            function(){
+                a=jQuery(this).attr('data-html-tooltip-title');
                 if ( a ){
                     if (debug) console.log( a );
 
@@ -337,21 +337,23 @@
                     timeRange.push( dateStr );
                 }
             } );
-        } 
+        }
         if ( jQuery('#quiz_student_details') ) {
-            jQuery('#quiz_student_details .value').each( 
-                function(){ 
-                    a=jQuery(this).text(); 
+            jQuery('#quiz_student_details .value').each(
+                function(){
+                    a=jQuery(this).text();
                     if ( a.indexOf(' - ') >0 ){
                         if (debug) console.log( a );
-    
+
                         let tmpAr = a.split( ' - ' );
                         if ( tmpAr[0].indexOf( ' at ' ) >0 ) {
-                            let dateStr1 = tmpAr[0].split(' at')[0];
+                            //let dateStr1 = tmpAr[0].split(' at')[0];
+                            let dateStr1 = tmpAr[0].replace( / at /, ' ' );
                             timeRange.push( dateStr1.trim() );
                         }
                         if ( (tmpAr.length >1) &&  (tmpAr[1].indexOf( ' at' ) >0) ){
-                            let dateStr2 = tmpAr[1].split(' at')[0];
+                            //let dateStr2 = tmpAr[1].split(' at')[0];
+                            let dateStr2 = tmpAr[1].split(/\r?\n/)[0].replace( / at /, ' ' );
                             timeRange.push( dateStr2.trim() );
                         }
                     }
@@ -361,6 +363,7 @@
     //} catch (e) {
    ////   errorHandler(e);
     //}
+    if (debug) console.log({timeRange});
     return timeRange;
   }
 
@@ -407,7 +410,7 @@
 
 //////////////////////////
 function createRemoteIpCSV() {
-   
+
     var fields = [
       'id',
       'sis_user_id',
@@ -427,7 +430,7 @@ function createRemoteIpCSV() {
         'Email',
         "Remote_Ip"
     ];
-  
+
     var remoteIpReportAr=[];
     var canSIS = false;
     var tmpUpi;
@@ -463,9 +466,9 @@ function createRemoteIpCSV() {
         userData[id].remote_ip = tmpIpAr;
         remoteIpReportAr[id]['remote_ip'] = userData[id].remote_ip.toString();
     }
-   
- 
-   
+
+
+
 
     if (debug) console.log( "remoteIp reportAr:", remoteIpReportAr );
     var CRLF = '\r\n';
