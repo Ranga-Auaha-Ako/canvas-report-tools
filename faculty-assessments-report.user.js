@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        UoA faculty assessment report download
 // @author      WenChen Hol
-// @namespace   https://github.com/Ranga-Auaha-Ako/canvas-report-tools/
+// @namespace   https://github.com/clearnz/canvas-report-tools/
 // @description For Canvas users, this tool generates a .CSV download of faculty assessment information
 // @downloadURL https://github.com/Ranga-Auaha-Ako/canvas-report-tools/raw/master/faculty-assessments-report.user.js
 // @include     https://*/accounts/1*
@@ -98,6 +98,7 @@
     mm = '0' + mm;
   }
   var defaultTermId = 243; // default 2023 semester 1
+  var termName = '';
   //courseId = getCourseId();
  // quizId = getQuizId(); 
 
@@ -346,8 +347,13 @@
         var blob = new Blob([csv], {
           'type': 'text/csv;charset=utf-8'
         });
+        if ( jQuery('#termFilter') ){
+          termName = jQuery('#termFilter').val();
+        } else {
+          termName = '2023-term-all-assignments-'
+        }
         
-        var savename = '2023-term-all-assignments-' + today + '.csv';
+        var savename = termName + today + '.csv';
         saveAs(blob, savename);
           $('#course-assignment-report').one('click', {
             type: 1
