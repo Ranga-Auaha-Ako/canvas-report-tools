@@ -18,6 +18,7 @@
   'use strict';
   var userData = {
   };
+  var userList = [];
   //
 
   //
@@ -37,6 +38,7 @@
   var yyyy = today.getFullYear();
   var debug = 0;
   var tmpFaculty = "";
+  var globalSSIndex = -1;
   if (dd < 10) {
     dd = '0' + dd;
   }
@@ -146,6 +148,7 @@
                       user.surname = splitname[0].trim();
                                            
                       userData[user.id] = user;
+                      userList.push(user.id);
                   } // end for
               } // end if length>0
           } catch(e){ continue; }
@@ -168,14 +171,31 @@
     }
   }
   function getFacultyInfo(){
-    
+    let m = userList.length;
+    globalSSIndex +=1;
+    needsFetched = m;
+    jQuery("#doing").html( "Fetching Student faculty, affliiate information <img src='https://flexiblelearning.auckland.ac.nz/images/spinner.gif'/>" );
+    progressbar(globalSSIndex, needsFetched);
+    if ( globalSSIndex < m ){
+        let tmpId = userList[globalSSIndex];
+        tmpFaculty = { "affiliate":"", "faculty":"" };
+        if ( tmpId ) {
+          console.log( "get faculty information:", userData[tmpId].login_id );
+          ldapUserDetail( tmpId, userData[tmpId].login_id );
+        } else{
+          getFacultyInfo();
+        }
+    } else {
+      getQuizSubmissionReport( courseId, quizId );
+    }
+    /*
     for (var id in userData) {
         tmpFaculty = { "affiliate":"", "faculty":"" };
         console.log( "get faculty information:", userData[id].login_id );
         ldapUserDetail( id, userData[id].login_id );
         //console.log( tmpFaculty );
-    }
-    getQuizSubmissionReport( courseId, quizId );
+    }*/
+    
   }
   function ldapUserDetail( id, upi ){
     if ( upi=='' ){
@@ -186,7 +206,7 @@
         console.log( udata );
         userData[id].affiliate = udata.affiliate;
         userData[id].faculty = udata.faculty;
-        
+        getFacultyInfo();
     } ).fail(function () {
         throw new Error('Failed to load student');
         return;
@@ -364,28 +384,32 @@ function createQuizSubmissionCSV() {
 
     var fields = [
       'finished_at',
-      'kept_score',
+      'scoreStr',
       'sis_user_id',
       'login_id',
       'first_name', 
       'last_name',
       'email',
+      'mobile',
       'affiliate',
-      'faculty'
+      'faculty', 
+      'year'
     ];
 
     //titleAr to store title for access code
 
     var titleAr = [
-        "Timestamp",
+        "Date Orientation Complete",
         'Score',
-        'AUID',
-        'Username',
+        'Student ID Number',
+        'University of Auckland Username',
         'First Name',
         'Last Name',
         'Email', 
-        'UoA Affiliation', 
-        'Faculty'
+        'Mobile',
+        'University of Auckland Affiliation', 
+        'Faculty',
+        'Year'
     ];
     var quizSubmissionReportAr=[];
     var canSIS = false;
@@ -434,12 +458,14 @@ function createQuizSubmissionCSV() {
         if (debug) console.log( "quiz_submissions item:", item );
         // the student
         tmpId = item.user_id;
-        quizSubmissionReportAr[tmpId]['score'] = item['score'];
-        quizSubmissionReportAr[tmpId]['kept_score'] = item['kept_score'];
-        quizSubmissionReportAr[tmpId]["finished_at"] = item['finished_at'];
+        quizSubmissionReportAr[tmpId]['scoreStr'] = ""+ item['kept_score'] + "/" + item['quiz_points_possible'];
+        //quizSubmissionReportAr[tmpId]['kept_score'] = item['kept_score'];
+        quizSubmissionReportAr[tmpId]["finished_at"] = excelDate( item['finished_at'] );
+        quizSubmissionReportAr[tmpId]["year"] = excelYear( item['finished_at'] );
+        quizSubmissionReportAr[tmpId]["mobile"] = '';
         //quizSubmissionReportAr[tmpId][ "attempt"] = item['attempt'];
-        quizSubmissionReportAr[tmpId]["workflow_state"] = item['workflow_state'];
-        quizSubmissionReportAr[tmpId]["fudge_points"] = item['fudge_points'];
+        //quizSubmissionReportAr[tmpId]["workflow_state"] = item['workflow_state'];
+        //quizSubmissionReportAr[tmpId]["fudge_points"] = item['fudge_points'];
         //quizSubmissionReportAr[tmpId][ "quiz_points_possible"] = item['quiz_points_possible'];
         //quizSubmissionReportAr[tmpId]["extra_attempts"] = item['extra_attempts'];
         //quizSubmissionReportAr[tmpId][ "extra_time"] = item['extra_time'];
@@ -518,8 +544,8 @@ function createQuizSubmissionCSV() {
       if (typeof dt !== 'object') {
         return '';
       }
-      d = dt.getFullYear() + '-' + pad(1 + dt.getMonth()) + '-' + pad(dt.getDate()) + ' ' + pad(dt.getHours()) + ':' + pad(dt.getMinutes()) + ':' + pad(dt.getSeconds());
-      //d = ""+ pad(dt.getFullYear()-2000) +  pad(1 + dt.getMonth()) +  pad(dt.getDate()) + ' ' + pad(dt.getHours()) + ':' + pad(dt.getMinutes()) + ':' + pad(dt.getSeconds());
+      //d = dt.getFullYear() + '-' + pad(1 + dt.getMonth()) + '-' + pad(dt.getDate()) + ' ' + pad(dt.getHours()) + ':' + pad(dt.getMinutes()) + ':' + pad(dt.getSeconds());
+      d = ""+ pad(dt.getDate()) + '/' + pad(1 + dt.getMonth()) +  '/'+ dt.getFullYear() + ' ' + pad(dt.getHours()) + ':' + pad(dt.getMinutes()) + ':' + pad(dt.getSeconds());
     } catch (e) {
       errorHandler(e);
     }
@@ -528,7 +554,26 @@ function createQuizSubmissionCSV() {
       return n < 10 ? '0' + n : n;
     }
   }
-
+function excelYear(timestamp) {
+    var d;
+    try {
+      if (!timestamp) {
+        return '';
+      }
+      timestamp = timestamp.replace('Z', '.000Z');
+      var dt = new Date(timestamp);
+      if (typeof dt !== 'object') {
+        return '';
+      }
+      d = ""+ dt.getFullYear();
+    } catch (e) {
+      errorHandler(e);
+    }
+    return d;
+    function pad(n) {
+      return n < 10 ? '0' + n : n;
+    }
+  }
   function progressbar(x, n) {
     try {
       if (typeof x === 'undefined' || typeof n == 'undefined') {
