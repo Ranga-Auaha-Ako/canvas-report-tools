@@ -38,7 +38,7 @@
   var senderEmail;
   var errMessage = '';
   var fileIndex = -1;
-  var skipMainLectureSection = 0;
+  var skipMainLectureSection = 1;
   if (dd < 10) {
     dd = '0' + dd;
   }
