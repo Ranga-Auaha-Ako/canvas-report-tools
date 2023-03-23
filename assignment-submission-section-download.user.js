@@ -38,6 +38,7 @@
   var senderEmail;
   var errMessage = '';
   var fileIndex = -1;
+  var skipMainLectureSection = 0;
   if (dd < 10) {
     dd = '0' + dd;
   }
@@ -346,12 +347,19 @@
     errMessage = '';
     if ( downloadSectionIndex < sections.length ) {
         getSectionFiles();
+    } else {
+      progressbar();
+      resetData();
     }
   }
 
   function fetchContent(zip){
     fileIndex +=1;
     let tmpSection = sections[ downloadSectionIndex ];
+    if ( tmpSection.files.length==0 ){
+      makeZipFile();
+      return;
+    }
     if ( fileIndex < tmpSection.files.length ){
         let tmpFileName = tmpSection.files[fileIndex].filename;
         let tmpUrl = tmpSection.files[fileIndex].url;
@@ -400,13 +408,21 @@
     let tmpUrl = '';
     let needsFetched = tmpSection.files.length;
     let filesFetched = 0;
+    
+    //if not to download main lecture section, as it contains most of the students, and that may not be the purpose
+    if ( skipMainLectureSection && tmpSection.name.endsWith("L01C") ){
+      //skip main section
+      makeZipFile();
+      return;
+    }
+
     jQuery("#doing").html( `
         Fetching files for ${tmpSection.name}  <img src='https://flexiblelearning.auckland.ac.nz/images/spinner.gif'/>
         ` );
     fileIndex = -1;
     fetchContent(zip);
     /*
-    if ( 'files' in tmpSection ){
+    if ( 'files' in tmpSection && tmpSection.files.length>0){
         //section.files is an array of objects
         for (let i=0;i<tmpSection.files.length;i++){
             
