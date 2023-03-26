@@ -40,7 +40,7 @@
   var errMessage = '';
   var fileIndex = -1;
   // if not wanting to download main lecture section, change the skipMainLectureSection to 1, otherwise change to 0
-  var skipMainLectureSection = 1;
+  var skipMainLectureSection = 0;
   if (dd < 10) {
     dd = '0' + dd;
   }
