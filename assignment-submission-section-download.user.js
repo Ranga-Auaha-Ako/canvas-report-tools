@@ -12,7 +12,7 @@
 // @require     https://stuk.github.io/jszip-utils/dist/jszip-utils.js
 // @require     https://smtpjs.com/v3/smtp.js
 
-// @version     0.1
+// @version     0.2
 // @grant       none
 // ==/UserScript==
 // based on code from James Jones' Canvancement https://github.com/jamesjonesmath/canvancement
@@ -27,6 +27,7 @@
   var courseId;
   var assignmentId;
   var sections = [];
+  var sectionsObj = {};
   var debug = 0;
   var aborted = false;
   var today = new Date();
@@ -38,6 +39,7 @@
   var senderEmail;
   var errMessage = '';
   var fileIndex = -1;
+  // if not wanting to download main lecture section, change the skipMainLectureSection to 1, otherwise change to 0
   var skipMainLectureSection = 1;
   if (dd < 10) {
     dd = '0' + dd;
@@ -71,7 +73,7 @@
     if ($('#assignment-submissionDownload').length === 0) {
         
         $('#sidebar_content').append(
-            '<span><a href="javascript:void(0)" id="assignment-submissionDownload" class="ui-corner-all" role="menuitem"><i class="icon-analytics"></i> Download student submissions by section</a></span>'
+            '<span><a href="javascript:void(0)" id="assignment-submissionDownload" class="ui-corner-all" role="menuitem"><i class="icon-analytics"></i> Download student submissions by section</a></span><div id="sectionsList"></div>'
             );
 
         $('#assignment-submissionDownload').one('click', {
@@ -127,13 +129,7 @@
   }
 
   function submissionSectionDownload(){
-    pending = 0;
-    fetched = 0;
-    aborted = false;
-    setupPool();
     
-    progressbar();
-    pending = 0;
     courseId = getCourseId();
     assignmentId = getAssignmentId();
     if ( debug ) console.log( { courseId, assignmentId } );
@@ -202,6 +198,7 @@
             let section = udata[i];
             section.files = [];
             sections.push( section );
+            sectionsObj[ section.id ] = section;
         }
         if (debug) console.log( "next url ?", url );
         //if (debug) console.log( "number ss:", studentIdAr.length );
@@ -213,8 +210,8 @@
 
         if (pending <= 0) {
             console.log( 'done get sections', sections );
-            
-            getStudentSubmissionInfo( );
+            showSectionList();
+            //getStudentSubmissionInfo( );
 
         } else{}
       }).fail(function () {
@@ -230,6 +227,45 @@
     }
   }
   
+  function showSectionList(){
+    let selectionHtml = `<br>Please choose your section(s) to download<br>`;
+    let sectionName='';
+    let sectionId = '';
+    for ( let i=0; i<sections.length; i++ ){
+      sectionName = sections[i].name;
+      sectionId = sections[i].id;
+      selectionHtml += `<label><input type="checkbox" name='chooseSections' value='${sectionId}' /> ${sectionName}</label><br>`;
+    }
+    selectionHtml +='<button id="downloadBySection" >Download</button>';
+    jQuery("#sectionsList").html( selectionHtml );
+    $('#downloadBySection').one('click', getSectionsChosen );
+  }
+
+  function getSectionsChosen(){
+    pending = 0;
+    fetched = 0;
+    aborted = false;
+    
+    let chosenSections=[];
+    $.each($("input[name='chooseSections']:checked"), function(){
+      chosenSections.push( sectionsObj[$(this).val()] );
+    });
+    if ( chosenSections.length >0 ){
+      sections = chosenSections;
+      console.log( sections );
+      setupPool();
+      
+      progressbar();
+      pending = 0;
+      jQuery("#sectionsList").html('');
+      getStudentSubmissionInfo( );
+    } else {
+      alert( 'Please choose some section(s) to download' );
+    }
+    
+    
+  }
+
   function getStudentSubmissionInfo( ){
     // get from each sections
     sectionIndex +=1;
