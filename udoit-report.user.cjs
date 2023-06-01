@@ -1,19 +1,4 @@
-// ==UserScript==
-// @name        UDOIT reports download
-// @author      WenChen Hol
-// @namespace   https://github.com/clearnz/canvas-report-tools/
-// @description Grab udoit admin data from all semesters and generates a .CSV download 
-// @downloadURL https://github.com/clearnz/canvas-report-tools/raw/master/udoit-report.user.js
-// @include     https://*.ciditools.com/admin*
-// @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
-// @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
-// @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
-// @require     https://flexiblelearning.auckland.ac.nz/javascript/xlsx.full.min.js
-// @version     0.1
-// @grant       none
-// ==/UserScript==
 
-// based on code from James Jones' Canvancement https://github.com/jamesjonesmath/canvancement
 
 (function () {
   'use strict';
