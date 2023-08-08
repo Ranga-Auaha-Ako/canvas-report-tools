@@ -9,7 +9,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/xlsx.full.min.js
-// @version     0.1
+// @version     0.2
 // @grant       none
 // ==/UserScript==
 
@@ -28,27 +28,26 @@
   // to combine 2022, 2023: term id: 234, 231, 230, 243, 241
 
   var terms = {
-    "1": "Default term",
     "243": "2023 Semester One",
     "242": "2023 Academic Year Term",
-    "241": "2023 Quarter One",
-    "222": "2021 Quarter Two",
+    "241": "2023 Quarter One",  
     "234": "2022 Semester Two",
     "244": "2023 Quarter Two",
     "240": "2023 Summer School",
     "245": "2023 Semester Two",
     "231": "2022 Semester One",
-    "111": "2020 Semester Two",
-    "106": "2020 Academic Year Term",
-    "218": "2021 Semester Two",
     "230": "2022 Summer School",
-    "64": "2019 Semester Two",
-    "217": "2021 Semester One",
-    "108": "2020 Semester One",
-    "63": "2019 Semester One"
+    "247": "2023 Quarter Four",
+    "246": "2023 Quarter Three",
+    "250": "2024 Summer School",
+    "228": "2022 Academic Year Term",
+    "248": "2023 Doctoral Academic Year",
+    "251": "2024 Quarter One",
+    "235": "2022 Quarter Three"
 } ;
   //var termsAr = [ "230", "231", "234", "241", "243" ];
-  var termsAr = [ "231", "234", "241", "243" ]; // make it shorter, just for quicker test purpose
+  var termsAr = [ "228", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251" ]; // make it shorter, just for quicker test purpose
+
   //var termsAr = [ "231" ]; // make it shorter, just for quicker test purpose
   var termIndex = -1;
   var tokenId = getToken();
@@ -149,7 +148,7 @@
       //try {
         if ( tokenId!=null ){
             if ($('#download-report').length === 0) {
-                $('.css-e4i4eu-truncateList-appNav__list').append('<li class="css-d1pl8m-view--flex-item"><button dir="ltr" id="download-report" cursor="pointer" class="css-d1pl8m-view--flex-item"><span class="css-1f9ldn1-item__label">Download 2022/23 Reports</span></button></li>');
+                $('.css-e4i4eu-truncateList-appNav__list').append('<li class="css-d1pl8m-view--flex-item"><button dir="ltr" id="download-report" cursor="pointer" class="css-d1pl8m-view--flex-item"><span class="css-1f9ldn1-item__label">Download 2022/23/24 Reports</span></button></li>');
                 
                 $('#download-report').one('click', {
                   type: 1
@@ -367,7 +366,7 @@
 
       var wb = XLSX.utils.book_new();
       wb.Props = {
-        Title: "2022/2023 UDOIT Reports",
+        Title: "2022/2023/24 UDOIT Reports",
         Subject:"UDOIT Reports",
         Author: "",
         CreatedDate: new Date()
@@ -421,11 +420,11 @@
     for ( let k=0; k < reportsAr.length;k++ ){
       reportObj = reportsAr[k];
       for ( [tmpDate, tmpObj ] of Object.entries(reportObj)) {
-        tmpDate = formateDate( tmpDate );
+        //tmpDate = formateDate( tmpDate );
         if (debug) console.log({tmpDate});
         if ( ! (tmpDate in reportDates) ) {
           reportDates[tmpDate] = {};
-          reportDates[tmpDate].date = tmpDate;
+          reportDates[tmpDate].date = tmpObj.created;
           reportDates[tmpDate].errors = tmpObj.errors;
           reportDates[tmpDate].suggestions = tmpObj.suggestions;
           reportDates[tmpDate].contentFixed = tmpObj.contentFixed;
