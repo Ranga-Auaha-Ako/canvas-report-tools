@@ -9,7 +9,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/xlsx.full.min.js
-// @version     0.2
+// @version     0.3
 // @grant       none
 // ==/UserScript==
 
@@ -46,7 +46,7 @@
     "235": "2022 Quarter Three"
 } ;
   //var termsAr = [ "230", "231", "234", "241", "243" ];
-  var termsAr = [ "228", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251" ]; // make it shorter, just for quicker test purpose
+  var termsAr = [ "1","71","106", "108","111", "217", "218", "222", "228", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251" ]; // make it shorter, just for quicker test purpose
 
   //var termsAr = [ "231" ]; // make it shorter, just for quicker test purpose
   var termIndex = -1;
@@ -129,6 +129,8 @@
   var yyyy = today.getFullYear();
 
   var debug = 0;
+  var debugDate = 0;
+  var debugReport = 1;
   if (dd < 10) {
     dd = '0' + dd;
   }
@@ -211,11 +213,11 @@
         if (debug) console.log( { termId } );
         getTerm( termId );
     } else {
-      console.log( {reportsAr} );
-      console.log( {actionsAr} );
-      console.log( {issuesAr} );
-      console.log( {file_issuesAr} );
-      console.log( {coursesAr} );
+      if (debug) console.log( {reportsAr} );
+      if (debug) console.log( {actionsAr} );
+      if (debug) console.log( {issuesAr} );
+      if (debug) console.log( {file_issuesAr} );
+      if (debug) console.log( {coursesAr} );
       //deal with report
       //each report array in own worksheet
       generateReports();
@@ -417,11 +419,15 @@
     let reportData = [];
     let tmpDate;
     let tmpObj; 
+    let tmpIndex;
+    //let totalCourses = 0;
     for ( let k=0; k < reportsAr.length;k++ ){
       reportObj = reportsAr[k];
-      for ( [tmpDate, tmpObj ] of Object.entries(reportObj)) {
-        //tmpDate = formateDate( tmpDate );
-        if (debug) console.log({tmpDate});
+      //if (debugReport) console.log(Object.entries(reportObj)); 
+      //for ( [tmpDate, tmpObj ] of Object.entries(reportObj)) {
+      for ( [tmpIndex, tmpObj ] of Object.entries(reportObj)) {
+        tmpDate = tmpObj.created;
+        
         if ( ! (tmpDate in reportDates) ) {
           reportDates[tmpDate] = {};
           reportDates[tmpDate].date = tmpObj.created;
@@ -430,7 +436,7 @@
           reportDates[tmpDate].contentFixed = tmpObj.contentFixed;
           reportDates[tmpDate].contentResolved = tmpObj.contentResolved;
           reportDates[tmpDate].courses = tmpObj.count;
-          if (debug) console.log( {reportDates} );
+          //if (debugDate) console.log( {reportDates} );
         } else {
           //console.log( tmpDate, " exist in reportDates" );
           reportDates[tmpDate].errors += tmpObj.errors;
@@ -439,18 +445,25 @@
           reportDates[tmpDate].contentResolved += tmpObj.contentResolved;
           reportDates[tmpDate].courses += tmpObj.count;
         }
+        if (debugReport) console.log(tmpDate, reportDates[tmpDate].courses);
       } 
     }
-    if (debug) console.log( {reportDates} );
+    if (debugDate) console.log( {reportDates}, Object.keys( reportDates ) );
+    //sort the reportData
+    reportData.sort((a, b) => (a.errors > b.errors) ? -1 : 1);
     let dates = Object.keys( reportDates );
-    
+    if (debugReport) console.log( {dates} );
     for ( let k=0; k < dates.length;k++ ){
       let dateitem = dates[k];
+      //totalCourses += reportDates[dateitem].courses;
+      
       ////////////////////////
+      //reportDates[dateitem].courses = totalCourses;
       reportData.push( reportDates[dateitem] );
       
     } //  end for dates
-    reportData.sort((a, b) => (a.errors > b.errors) ? -1 : 1);
+    
+    //reportData.sort((a, b) => (a.date > b.date) ? -1 : 1);
     return reportData;
   }
   
@@ -498,7 +511,7 @@
           issueObjects[ issueName ].resolved = issueObjects[ issueName ].resolved + tmpObj.resolved;
           issueObjects[ issueName ].courses = issueObjects[ issueName ].courses + tmpObj.courses;
           issueObjects[ issueName ].total = issueObjects[ issueName ].total + tmpObj.total;
-          console.log( "after add:", issueObjects[ issueName ] );
+          if (debug) console.log( "after add:", issueObjects[ issueName ] );
         } else {
           if (debug) console.log( {issueName}, "not in issueObjects"  )
           issueObjects[ issueName ] = { ...tmpObj };
