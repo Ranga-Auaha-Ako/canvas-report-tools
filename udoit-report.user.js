@@ -46,8 +46,8 @@
     "235": "2022 Quarter Three"
 } ;
   //var termsAr = [ "230", "231", "234", "241", "243" ];
-  var termsAr = [ "1","71","106", "108","111", "217", "218", "222", "228", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251" ]; // make it shorter, just for quicker test purpose
-  //var termsAr = [ "1", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251" ]; // make it shorter, just for quicker test purpose
+  //var termsAr = [ "1","71","106", "108","111", "217", "218", "222", "228", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251" ]; // make it shorter, just for quicker test purpose
+  var termsAr = [ "1", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251" ]; // make it shorter, just for quicker test purpose
   //var termsAr = [ "231" ]; // make it shorter, just for quicker test purpose
   var termIndex = -1;
   var tokenId = getToken();
@@ -470,6 +470,10 @@
         // if the date exceed term last date, add the max value;
         if (debugReport) console.log( "in report:", tmpObj );
         if ( dateitem > tmpObj.created ){
+          reportDates[dateitem].errors += tmpObj.errors;
+          reportDates[dateitem].suggestions += tmpObj.suggestions;
+          reportDates[dateitem].contentFixed += tmpObj.contentFixed;
+          reportDates[dateitem].contentResolved += tmpObj.contentResolved;
           reportDates[dateitem].courses += tmpObj.count;
         }
       }
@@ -480,7 +484,7 @@
     } //  end for dates
     
     //reportData.sort((a, b) => (a.date > b.date) ? -1 : 1);
-    return reportData;
+    return reportData.reverse();
   }
   
   function genIssuesAr(){
