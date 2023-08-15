@@ -9,7 +9,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/xlsx.full.min.js
-// @version     0.3
+// @version     0.4
 // @grant       none
 // ==/UserScript==
 
@@ -47,7 +47,7 @@
 } ;
   //var termsAr = [ "230", "231", "234", "241", "243" ];
   var termsAr = [ "1","71","106", "108","111", "217", "218", "222", "228", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251" ]; // make it shorter, just for quicker test purpose
-
+  //var termsAr = [ "1", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251" ]; // make it shorter, just for quicker test purpose
   //var termsAr = [ "231" ]; // make it shorter, just for quicker test purpose
   var termIndex = -1;
   var tokenId = getToken();
@@ -121,7 +121,6 @@
   var pending = - 1;
   var fetched = 0;
   var needsFetched = 0;
-  var fetched = 0;
   var ajaxPool;
   var today = new Date();
   var dd = today.getDate();
@@ -130,7 +129,7 @@
 
   var debug = 0;
   var debugDate = 0;
-  var debugReport = 1;
+  var debugReport = 0;
   if (dd < 10) {
     dd = '0' + dd;
   }
@@ -252,7 +251,11 @@
       if ( udata.data ) {
         let reports = udata.data.reports;
         //console.log( reports );
-        reportsAr.push(reports );
+        //assign term id for each report object
+        for ( let i=0; i<reports.length; i++ ){
+          reports[i].term = termId;
+        }
+        reportsAr.push( reports );
       }
       
       getIssues( termId );
@@ -415,11 +418,14 @@
   
   function genReportsAr(){
     let reportDates = {};
+    let maxTermVal = {};
+    
     let reportObj;
     let reportData = [];
     let tmpDate;
     let tmpObj; 
     let tmpIndex;
+    let tmpTermId;
     //let totalCourses = 0;
     for ( let k=0; k < reportsAr.length;k++ ){
       reportObj = reportsAr[k];
@@ -427,6 +433,7 @@
       //for ( [tmpDate, tmpObj ] of Object.entries(reportObj)) {
       for ( [tmpIndex, tmpObj ] of Object.entries(reportObj)) {
         tmpDate = tmpObj.created;
+        tmpTermId = tmpObj.term;
         
         if ( ! (tmpDate in reportDates) ) {
           reportDates[tmpDate] = {};
@@ -445,6 +452,9 @@
           reportDates[tmpDate].contentResolved += tmpObj.contentResolved;
           reportDates[tmpDate].courses += tmpObj.count;
         }
+        //register for last course count and date for each date
+        maxTermVal[ tmpTermId ] = tmpObj;
+        
         if (debugReport) console.log(tmpDate, reportDates[tmpDate].courses);
       } 
     }
@@ -456,7 +466,13 @@
     for ( let k=0; k < dates.length;k++ ){
       let dateitem = dates[k];
       //totalCourses += reportDates[dateitem].courses;
-      
+      for ( [tmpIndex, tmpObj ] of Object.entries(maxTermVal)) {
+        // if the date exceed term last date, add the max value;
+        if (debugReport) console.log( "in report:", tmpObj );
+        if ( dateitem > tmpObj.created ){
+          reportDates[dateitem].courses += tmpObj.count;
+        }
+      }
       ////////////////////////
       //reportDates[dateitem].courses = totalCourses;
       reportData.push( reportDates[dateitem] );
