@@ -7,7 +7,7 @@
 // @include     https://*/courses/*/pages/*/edit
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
-// @version     0.52
+// @version     0.53
 // @grant       none
 // ==/UserScript==
 
@@ -154,7 +154,7 @@
         //prepare the breadcrumb code
         genBreadCrumbCode();
         if ($('#breadcrumb').length === 0) {
-          $('#edit_wikipage_title_container').append('<a href="javascript:void(0)" id="breadcrumb" class="btn" style="float:right;clear:both;"> Get breadcrum code</a>');
+          $('#edit_wikipage_title_container').append('<a href="javascript:void(0)" id="breadcrumb" class="btn"> Get breadcrum code</a>');
           //$('#title').after('<a href="javascript:void(0)" id="breadcrumb" class="btn" style="float:right;clear:both;"> Get breadcrum code</a>');
           $('#breadcrumb').on('click', {
             type: 1
@@ -359,12 +359,30 @@
    
     } else  {
       //if has include CourseHeader
-      if ( tinyMCE.activeEditor.dom.select('.CourseHeader') ){
+      if (tmpContent.indexOf('class="CourseHeader"')>-1 ){
         //add breadcrumb at the cursor 
-        tinymce.activeEditor.selection.setContent(tinymce.activeEditor.dom.createHTML('div', {}, breadCrumbCode));
+        //tinymce.activeEditor.selection.setContent(tinymce.activeEditor.dom.createHTML('div', {}, breadCrumbCode));
+        let tmpHeader = tinyMCE.activeEditor.dom.select('.CourseHeader')[0];
         
+        let brElement = tinymce.activeEditor.dom.create('p', {id:"headerBr"}, '');
+        let breadCrumbContainer = tinymce.activeEditor.dom.create('div', {}, breadCrumbCode );
+        tinyMCE.activeEditor.dom.insertAfter( brElement, tmpHeader);
+        tinyMCE.activeEditor.dom.insertAfter( breadCrumbContainer, brElement );
       } else {
-        tinyMCE.activeEditor.setContent(  breadCrumbCode + tmpContent);
+        if ( tinyMCE.activeEditor.dom.select('header') ){
+          //add breadcrumb at the cursor 
+          //tinymce.activeEditor.selection.setContent(tinymce.activeEditor.dom.createHTML('div', {}, breadCrumbCode));
+          let tmpHeader = tinyMCE.activeEditor.dom.select('header')[0];
+          let tmpHeaderParent = tinyMCE.activeEditor.dom.getParent( tmpHeader, 'div' );
+          console.log( { tmpHeaderParent } );
+          let brElement = tinymce.activeEditor.dom.create('p', {id:"headerBr"}, '');
+          let breadCrumbContainer = tinymce.activeEditor.dom.create('div', {}, breadCrumbCode );
+          tinyMCE.activeEditor.dom.insertAfter( brElement, tmpHeaderParent);
+          tinyMCE.activeEditor.dom.insertAfter( breadCrumbContainer, brElement );
+        } else {
+          tinyMCE.activeEditor.setContent(  breadCrumbCode + tmpContent);
+        }
+        
       }
       
     }
