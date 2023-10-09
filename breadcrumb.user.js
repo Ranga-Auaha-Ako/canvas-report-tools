@@ -7,7 +7,7 @@
 // @include     https://*/courses/*/pages/*/edit
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
-// @version     0.5
+// @version     0.51
 // @grant       none
 // ==/UserScript==
 
@@ -358,7 +358,15 @@
        }
    
     } else  {
-      tinyMCE.activeEditor.setContent(  breadCrumbCode + tmpContent);
+      //if has include CourseHeader
+      if ( tinyMCE.activeEditor.dom.select('.CourseHeader') ){
+        //add breadcrumb at the cursor 
+        tinymce.activeEditor.selection.setContent(tinymce.activeEditor.dom.createHTML('div', {}, breadCrumbCode));
+        
+      } else {
+        tinyMCE.activeEditor.setContent(  breadCrumbCode + tmpContent);
+      }
+      
     }
 
     //tinyMCE.execCommand('mceInsertContent', false, breadCrumbCode);
