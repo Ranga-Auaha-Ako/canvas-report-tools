@@ -7,7 +7,7 @@
 // @include     https://*/courses/*/pages/*/edit
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
-// @version     0.53
+// @version     0.54
 // @grant       none
 // ==/UserScript==
 
@@ -167,7 +167,9 @@
   function genBreadCrumbCode(){
     // find what the module of the page in
     //let title = $('#title').val().trim();
-    let title = document.title.split(":")[0].trim();
+    let titleAr = document.title.split(":");
+    titleAr.pop();
+    let title = titleAr.join(":");
     let found = -1;
     let pageAt = 0;
     let resultHtml = '';
