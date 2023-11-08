@@ -25,7 +25,7 @@ abbr {
 	left: -10px;
 	padding: 1em;
 	position: absolute;
-	width: 280px;
+	width: 400px;
 	z-index: 1;
   }
 `
