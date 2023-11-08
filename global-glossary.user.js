@@ -22,7 +22,7 @@ abbr {
 	bottom: 100%;
 	content: attr(title);
 	display: block;
-	left: 100%;
+	left: -10px;
 	padding: 1em;
 	position: absolute;
 	width: 280px;
