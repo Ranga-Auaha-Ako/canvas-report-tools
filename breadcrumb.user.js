@@ -7,7 +7,7 @@
 // @include     https://*/courses/*/pages/*/edit
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
-// @version     0.54
+// @version     0.55
 // @grant       none
 // ==/UserScript==
 
@@ -28,8 +28,9 @@
   var breadCrumbCode=''; 
   var breadCrumbHead=`
   <div id="breadcrumbDiv">
-    <div class="breadcrumb" style="margin: 0; padding: 1em; background: #eee; border-width: 1px; border-style: solid; border-color: #f5f5f5 #e5e5e5 #ccc; overflow: hidden;">
-        <span style="font-size: 10pt;">`;
+    <div class="breadcrumb" style="margin: 0; padding: 1em; border-width: 1px; border-style: solid; border-color: #dedede; overflow: hidden;">
+        <span style="font-size: 10pt;color:#2D3B45;">`;
+        //rgba(3, 116, 181, 1)
   var breadCrumbEnd = `
         </span>
     </div>
