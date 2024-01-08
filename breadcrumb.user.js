@@ -7,7 +7,7 @@
 // @include     https://*/courses/*/pages/*/edit
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
-// @version     0.55
+// @version     0.56
 // @grant       none
 // ==/UserScript==
 
@@ -170,7 +170,7 @@
     //let title = $('#title').val().trim();
     let titleAr = document.title.split(":");
     titleAr.pop();
-    let title = titleAr.join(":");
+    let title = titleAr.join(":").trim();
     let found = -1;
     let pageAt = 0;
     let resultHtml = '';
@@ -183,6 +183,9 @@
             if ( tmpModule.items.length>0 ){
                 for ( let j=0; j< tmpModule.items.length; j++ ){
                     let tmpNode = tmpModule.items[j];
+                    if (debug){
+                      console.log( tmpNode.title, title );
+                    }
                     if ( tmpNode.title.trim() == title ){
                         found = i;
                         pageAt = j;
@@ -375,13 +378,18 @@
         if ( tinyMCE.activeEditor.dom.select('header') ){
           //add breadcrumb at the cursor 
           //tinymce.activeEditor.selection.setContent(tinymce.activeEditor.dom.createHTML('div', {}, breadCrumbCode));
-          let tmpHeader = tinyMCE.activeEditor.dom.select('header')[0];
-          let tmpHeaderParent = tinyMCE.activeEditor.dom.getParent( tmpHeader, 'div' );
-          console.log( { tmpHeaderParent } );
-          let brElement = tinymce.activeEditor.dom.create('p', {id:"headerBr"}, '');
-          let breadCrumbContainer = tinymce.activeEditor.dom.create('div', {}, breadCrumbCode );
-          tinyMCE.activeEditor.dom.insertAfter( brElement, tmpHeaderParent);
-          tinyMCE.activeEditor.dom.insertAfter( breadCrumbContainer, brElement );
+          try{
+            let tmpHeader = tinyMCE.activeEditor.dom.select('header')[0];
+            let tmpHeaderParent = tinyMCE.activeEditor.dom.getParent( tmpHeader, 'div' );
+            console.log( { tmpHeaderParent } );
+            let brElement = tinymce.activeEditor.dom.create('p', {id:"headerBr"}, '');
+            let breadCrumbContainer = tinymce.activeEditor.dom.create('div', {}, breadCrumbCode );
+            tinyMCE.activeEditor.dom.insertAfter( brElement, tmpHeaderParent);
+            tinyMCE.activeEditor.dom.insertAfter( breadCrumbContainer, brElement );
+          } catch(e){
+            tinyMCE.activeEditor.setContent(  breadCrumbCode + tmpContent);
+          }
+
         } else {
           tinyMCE.activeEditor.setContent(  breadCrumbCode + tmpContent);
         }
