@@ -7,7 +7,7 @@
 // @include     https://*/courses/*/pages/*/edit
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
-// @version     0.62
+// @version     0.63
 // @grant       none
 // ==/UserScript==
 
@@ -133,9 +133,9 @@
             if (debugN) console.log( "number of modules:", modules.length );
             //moduleIndex = -1;
             //getModuleItems( );
-            genBreadCrumbCode();
-            delay(1000).then(() =>{
-
+            
+            delay(1500).then(() =>{
+              genBreadCrumbCode();
               $('#edit_wikipage_title_container').append('<a href="javascript:void(0)" id="breadcrumb" class="btn" style="float:right;clear:both;"> Get breadcrum code</a><p>&nbsp;</p>');
               $('#breadcrumb').on('click', {
                 type: 1
@@ -149,9 +149,10 @@
   function genBreadCrumbCode(){
     // find what the module of the page in
     //let title = $('#title').val().trim();
-    let titleAr = document.title.split(":");
-    titleAr.pop();
-    let title = titleAr.join(":").trim();
+    //let titleAr = document.title.split(":");
+    //titleAr.pop();
+    //let title = titleAr.join(":").trim();
+    let title = jQuery('#TextInput_0').val().trim();
     let found = -1;
     let pageAt = 0;
     let resultHtml = '';
