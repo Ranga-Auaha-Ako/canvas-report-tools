@@ -7,7 +7,7 @@
 // @include     https://*/courses/*/pages/*/edit
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
-// @version     0.56
+// @version     0.6
 // @grant       none
 // ==/UserScript==
 
@@ -24,6 +24,7 @@
   var ajaxPool;
   var courseId;
   var debug = 0;
+  var debugN = 1;
   var moduleIndex = -1;
   var breadCrumbCode=''; 
   var breadCrumbHead=`
@@ -87,7 +88,7 @@
     //var url = '/api/v1/courses/' + courseId + '/discussion_topics/' + discussionId + "/view";
     //progressbar();
     pending = 0;
-    var url = '/api/v1/courses/'+ courseId + '/modules?per_page=30';
+    var url = '/api/v1/courses/'+ courseId + '/modules?include[]=items&per_page=30';
     getModules( url );
 
   }
@@ -120,51 +121,27 @@
         for ( var i=0; i < adata.length; i++ ){
             modules[ i ] = adata[i];
             // use items to record all item object in a module
-            modules[ i ][ 'items' ] = [];
+            //modules[ i ][ 'items' ] = [];
         } // end for
         if (url) {
             getModules( url );
-        }
-        pending--;
-        if (pending <= 0) {
-            if (debug) console.log( modules );
-            if (debug) console.log( "number of modules:", modules.length );
-            getModuleItems( );
-
+        } else{
+            if (debugN) console.log( modules );
+            if (debugN) console.log( "number of modules:", modules.length );
+            //moduleIndex = -1;
+            //getModuleItems( );
+            genBreadCrumbCode();
+            //if ($('#breadcrumb').length === 0) {
+              $('#edit_wikipage_title_container').append('<a href="javascript:void(0)" id="breadcrumb" class="btn" style="float:right;clear:both;"> Get breadcrum code</a><p>&nbsp;</p>');
+              $('#breadcrumb').on('click', {
+                type: 1
+              }, getBreadcrumb);
+            //}
         }
     } );
   }
 
-  function getModuleItems() { //cycles through module list
-    let items_url;
-    pending = 0;
-    fetched = 0;
-
-    moduleIndex +=1;
-    if ( moduleIndex < modules.length ) {
-        items_url = modules[moduleIndex]["items_url"];
-        if ( items_url!="" ) {
-            getItems(items_url);
-        } else{
-            getModuleItems();
-        }
-        
-    } else{
-        //print out result 
-        if (debug) console.log( modules );
-        //prepare the breadcrumb code
-        genBreadCrumbCode();
-        if ($('#breadcrumb').length === 0) {
-          $('#edit_wikipage_title_container').append('<a href="javascript:void(0)" id="breadcrumb" class="btn"> Get breadcrum code</a>');
-          //$('#title').after('<a href="javascript:void(0)" id="breadcrumb" class="btn" style="float:right;clear:both;"> Get breadcrum code</a>');
-          $('#breadcrumb').on('click', {
-            type: 1
-          }, getBreadcrumb);
-        }
-    }
   
-  }
-
   function genBreadCrumbCode(){
     // find what the module of the page in
     //let title = $('#title').val().trim();
@@ -189,8 +166,8 @@
                     if ( tmpNode.title.trim() == title ){
                         found = i;
                         pageAt = j;
-                        if (debug){
-                            console.log( "Module found" );
+                        if (debugN){
+                            console.log( "Module found", found );
                         }
                         break;
                     }
@@ -262,51 +239,7 @@
         }
         resultHtml = breadCrumbHead + resultHtml + breadCrumbEnd;
         breadCrumbCode = resultHtml;
-        if (debug) console.log( resultHtml );
-    }
-  }
-
-  function getItems(items_url) { //get peer review data
-    
-    let tmpItem;
-    let url;
-    try {
-      if (aborted) {
-        throw new Error('Aborted');
-      }
-      pending++;
-      if (debug) console.log( "get module item:", items_url  )
-      
-      $.getJSON(items_url, function (adata, status, jqXHR) {
-        //get participants:  id, display_name
-        for ( var i=0; i < adata.length; i++ ) {
-          tmpItem = adata[i];
-          modules[ moduleIndex ]['items'].push( adata[i] );
-        }
-        
-        //get views: userid, message 
-               
-        url = nextURL(jqXHR.getResponseHeader('Link'));
-        
-        if (url) {
-          getItems( url );
-        }
-        pending--;
-        
-        if (debug) console.log( "pending:", pending  );
-        if (pending <= 0 && !aborted) {
-          // get next module
-          getModuleItems()
-        }
-      }).fail(function () {
-        pending--;
-        getModuleItems()
-        if (!aborted) {
-          console.log('Some report data failed to load');
-        }
-      });
-    } catch (e) {
-      errorHandler(e);
+        if (debugN) console.log( {resultHtml} );
     }
   }
 
