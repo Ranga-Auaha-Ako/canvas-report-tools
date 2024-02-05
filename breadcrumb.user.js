@@ -7,7 +7,7 @@
 // @include     https://*/courses/*/pages/*/edit
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
-// @version     0.61
+// @version     0.62
 // @grant       none
 // ==/UserScript==
 
@@ -18,7 +18,7 @@
   var modules = [];
   //
 
-  
+
   var pending = - 1;
   var fetched = 0;
   var ajaxPool;
@@ -26,7 +26,7 @@
   var debug = 0;
   var debugN = 1;
   var moduleIndex = -1;
-  var breadCrumbCode=''; 
+  var breadCrumbCode='';
   var breadCrumbHead=`
   <div id="breadcrumbDiv">
     <div class="breadcrumb" style="margin: 0; padding: 1em; border-width: 1px; border-style: solid; border-color: #dedede; overflow: hidden;">
@@ -36,13 +36,13 @@
         </span>
     </div>
   </div>`;
- 
+
   var aborted = false;
   addGetBreadcrumbLink();
 
   function addGetBreadcrumbLink() {
 
-        
+
         generateBreadCrumbCode()
 
     return;
@@ -75,15 +75,15 @@
     }
   }
 
- 
+
   function generateBreadCrumbCode(e) { //gets the student list
     pending = 0;
     fetched = 0;
-   
+
     aborted = false;
     setupPool();
     courseId = getCourseId();
-    
+
     if (debug) console.log( courseId );
     //var url = '/api/v1/courses/' + courseId + '/discussion_topics/' + discussionId + "/view";
     //progressbar();
@@ -108,12 +108,15 @@
     return url;
   }
 
-  
+  function delay(time) {
+    return new Promise(resolve => setTimeout(resolve, time));
+  }
+
   function getModules ( url ) { //cycles through student list
     pending = 0;
     fetched = 0;
     //needsFetched = Object.getOwnPropertyNames(userData).length;
-    
+
     pending++;
     $.getJSON(url, function (adata, status, jqXHR) {
         url = nextURL(jqXHR.getResponseHeader('Link'));
@@ -131,17 +134,18 @@
             //moduleIndex = -1;
             //getModuleItems( );
             genBreadCrumbCode();
-            //if ($('#breadcrumb').length === 0) {
+            delay(1000).then(() =>{
+
               $('#edit_wikipage_title_container').append('<a href="javascript:void(0)" id="breadcrumb" class="btn" style="float:right;clear:both;"> Get breadcrum code</a><p>&nbsp;</p>');
               $('#breadcrumb').on('click', {
                 type: 1
               }, getBreadcrumb);
-            //}
+            });
         }
     } );
   }
 
-  
+
   function genBreadCrumbCode(){
     // find what the module of the page in
     //let title = $('#title').val().trim();
@@ -156,7 +160,7 @@
     let tmpIconCode;
     if ( title ){
         for ( let i=0; i< modules.length; i++){
-            
+
             let tmpModule = modules[i];
             //console.log( { tmpModule }, i );
             if ( tmpModule.items.length>0 ){
@@ -182,11 +186,11 @@
             tmpNodes = tmpModule.items;
             //add module link
             resultHtml += `
-            <a style="max-width: 20%; white-space: nowrap; overflow: hidden; text-decoration: none; position: relative;" 
-            title="${tmpModule.name}" 
-            href="https://canvas.auckland.ac.nz/courses/${courseId}/modules/${tmpModule.id}" 
+            <a style="max-width: 20%; white-space: nowrap; overflow: hidden; text-decoration: none; position: relative;"
+            title="${tmpModule.name}"
+            href="https://canvas.auckland.ac.nz/courses/${courseId}/modules/${tmpModule.id}"
             data-api-endpoint="https://canvas.auckland.ac.nz/api/v1/courses/${courseId}/modules/${tmpModule.id}" data-api-returntype="Module">
-            <strong>${tmpModule.name}</strong></a> `; 
+            <strong>${tmpModule.name}</strong></a> `;
             for (let m=0;m<tmpNodes.length;m++){
                 if (m==pageAt){
                     resultHtml +=`
@@ -219,22 +223,22 @@
                                 tmpIconCode = '';
                         }
                         resultHtml +=`
-                        &nbsp;&gt; 
-                        
-                        <a style="max-width: 20%; white-space: nowrap; overflow: hidden; text-decoration: none; position: relative;" 
-                        title="${tmpNodes[m].title}" 
-                        href="${tmpNodes[m].html_url}" 
-                        data-api-endpoint="${tmpNodes[m].url}" 
+                        &nbsp;&gt;
+
+                        <a style="max-width: 20%; white-space: nowrap; overflow: hidden; text-decoration: none; position: relative;"
+                        title="${tmpNodes[m].title}"
+                        href="${tmpNodes[m].html_url}"
+                        data-api-endpoint="${tmpNodes[m].url}"
                         data-api-returntype="${tmpNodes[m].type}">
                         ${tmpIconCode}
-                        &nbsp;${tmpNodes[m].title} 
+                        &nbsp;${tmpNodes[m].title}
                         </a>
                         `;
                     } else {
                         resultHtml +=`
                         &nbsp;&gt; <span class='title locked_title'> ${tmpNodes[m].title}</span> `;
                     }
-                    
+
 
                 }
             }
@@ -270,7 +274,7 @@
         //jQuery( "#breadcrumbCode" ).val( breadCrumbCode );
         jQuery('#breadcrumbContainer').dialog( {
             title: 'Breadcrumb code copied to clipboard',
-            width: 600, 
+            width: 600,
             buttons: {
                 InsertBreadCrumb: function() {
                     insertBreadCrumb();
@@ -284,7 +288,7 @@
   }
   function insertBreadCrumb(){
     let tmpContent = tinyMCE.activeEditor.getContent();
-    
+
     //console.log( $t.find( "#breadcrumbContainer" ) );
     if (tmpContent.indexOf('<div id="breadcrumbDiv"')>-1 ){
       if (debug) console.log('previous breadcrumb exist');
@@ -297,21 +301,21 @@
        } else{
           tinyMCE.activeEditor.setContent(  breadCrumbCode + tmpContent);
        }
-   
+
     } else  {
       //if has include CourseHeader
       if (tmpContent.indexOf('class="CourseHeader"')>-1 ){
-        //add breadcrumb at the cursor 
+        //add breadcrumb at the cursor
         //tinymce.activeEditor.selection.setContent(tinymce.activeEditor.dom.createHTML('div', {}, breadCrumbCode));
         let tmpHeader = tinyMCE.activeEditor.dom.select('.CourseHeader')[0];
-        
+
         let brElement = tinymce.activeEditor.dom.create('p', {id:"headerBr"}, '');
         let breadCrumbContainer = tinymce.activeEditor.dom.create('div', {}, breadCrumbCode );
         tinyMCE.activeEditor.dom.insertAfter( brElement, tmpHeader);
         tinyMCE.activeEditor.dom.insertAfter( breadCrumbContainer, brElement );
       } else {
         if ( tinyMCE.activeEditor.dom.select('header') ){
-          //add breadcrumb at the cursor 
+          //add breadcrumb at the cursor
           //tinymce.activeEditor.selection.setContent(tinymce.activeEditor.dom.createHTML('div', {}, breadCrumbCode));
           try{
             let tmpHeader = tinyMCE.activeEditor.dom.select('header')[0];
@@ -328,9 +332,9 @@
         } else {
           tinyMCE.activeEditor.setContent(  breadCrumbCode + tmpContent);
         }
-        
+
       }
-      
+
     }
 
     //tinyMCE.execCommand('mceInsertContent', false, breadCrumbCode);
