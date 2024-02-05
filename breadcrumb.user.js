@@ -7,7 +7,7 @@
 // @include     https://*/courses/*/pages/*/edit
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
-// @version     0.6
+// @version     0.61
 // @grant       none
 // ==/UserScript==
 
@@ -156,7 +156,9 @@
     let tmpIconCode;
     if ( title ){
         for ( let i=0; i< modules.length; i++){
+            
             let tmpModule = modules[i];
+            //console.log( { tmpModule }, i );
             if ( tmpModule.items.length>0 ){
                 for ( let j=0; j< tmpModule.items.length; j++ ){
                     let tmpNode = tmpModule.items[j];
