@@ -568,7 +568,7 @@
   }
 
   function resetData(){
-    sectin = [];
+    //sectin = [];
     pending = - 1;
     fetched = 0;
     needsFetched = 0;
