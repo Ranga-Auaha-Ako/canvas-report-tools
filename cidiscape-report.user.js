@@ -4,12 +4,12 @@
 // @namespace   https://github.com/clearnz/canvas-report-tools/
 // @description Grab Cidi Labs Cidiscape data from all batches and generates an excel download 
 // @downloadURL https://github.com/clearnz/canvas-report-tools/raw/master/cidiscape-report.user.js
-// @include     https://apac.cidiscape.ciditools.com/*
+// @match     https://apac.cidiscape.ciditools.com/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/xlsx.full.min.js
-// @version     0.1
+// @version     0.11
 // @grant       none
 // ==/UserScript==
 
