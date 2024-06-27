@@ -20,7 +20,9 @@
   // append Canvas jQuery UI css, for dialog style
   $("head").append (
     '<link '
-  + 'href="//du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-04107f0c72.css" '
+  
+  + 'href="//du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-1682390572.css " '
+  //+ 'href="//du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-04107f0c72.css" '
   + 'rel="stylesheet" type="text/css">'
 );
 
