@@ -3,13 +3,15 @@
 // @author      WenChen Hol
 // @namespace   https://github.com/clearnz/canvas-report-tools/
 // @description Grab Cidi Labs Cidiscape data from all batches and generates an excel download
-// @match     https://apac.cidiscape.ciditools.com/*
+// @match       https://apac.cidiscape.ciditools.com/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/xlsx.full.min.js
-// @version     0.2
-// @grant       none
+// @resource     REMOTE_CSS https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-1682390572.css
+// @version     0.3
+// @grant        GM_getResourceText
+// @grant        GM_addStyle
 // ==/UserScript==
 /* global $, jQuery,XLSX,saveAs */
 
@@ -18,14 +20,13 @@
 (function () {
   'use strict';
   // append Canvas jQuery UI css, for dialog style
-  $("head").append (
-    '<link '
-  
-  + 'href="//du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-1682390572.css" '
-  //+ 'href="//du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-04107f0c72.css" '
-  + 'rel="stylesheet" type="text/css">'
-);
-
+//  $("head").append (
+//    '<link '
+//  + 'href="//du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-1682390572.css" '
+//  + 'rel="stylesheet" type="text/css">'
+//);
+  const myCss = GM_getResourceText("REMOTE_CSS");
+  GM_addStyle(myCss);
   var batches = []; // make it shorter, just for quicker test purpose
   var batchIndex = -1;
   var courseReportIndex = -1;
