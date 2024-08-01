@@ -3,13 +3,13 @@
 // @author      WenChen Hol
 // @namespace   https://github.com/clearnz/canvas-report-tools/
 // @description Grab Cidi Labs Cidiscape data from all batches and generates an excel download
-// @match       https://apac.cidiscape.ciditools.com/*
+// @match     https://apac.cidiscape.ciditools.com/*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/xlsx.full.min.js
 // @resource     REMOTE_CSS https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-1682390572.css
-// @version     0.3
+// @version     0.4
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
 // ==/UserScript==
@@ -87,8 +87,7 @@
       //try {
         if ( tokenId!=null ){
             if ($('#download-report').length === 0) {
-                $('.css-e4i4eu-truncateList-appNav__list').append('<li class="css-166z3xu-truncateList__listItem"><button class="css-13npier-view--flex-item" dir="ltr" id="download-report" cursor="pointer" class="css-d1pl8m-view--flex-item"><span class="css-1f9ldn1-item__label">Download All Reports</span></button></li>');
-
+                $('.css-1rc109g-truncateList-topNavBarMenuItems').append('<div class="css-rjq4yf-topNavBarItem" data-cid="TopNavBarItem"><div class="css-13hhs2r-topNavBarItem__container"><button dir="ltr" id="download-report" cursor="pointer" type="button" tabindex="0" class="css-1hj8nz2-view--inlineBlock-baseButton" data-cid="BaseButton"><span class="css-fhkclk-baseButton__content"><span class="css-11xkk0o-baseButton__children"><div class="css-f6cwac-topNavBarItem__content">Download All Reports</div></span></span></button></div></div>');
                 $('#download-report').one('click', {
                   type: 1
                 }, allReports);
