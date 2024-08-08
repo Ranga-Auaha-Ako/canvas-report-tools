@@ -7,9 +7,12 @@
 // @include     https://*/courses/*/pages/*/edit
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
-// @version     0.63
-// @grant       none
+// @resource     REMOTE_CSS https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-1682390572.css
+// @version     0.64
+// @grant        GM_getResourceText
+// @grant        GM_addStyle
 // ==/UserScript==
+/* global $, jQuery */
 
 // based on code from James Jones' Canvancement https://github.com/jamesjonesmath/canvancement
 
@@ -17,7 +20,8 @@
   'use strict';
   var modules = [];
   //
-
+  const myCss = GM_getResourceText("REMOTE_CSS");
+  GM_addStyle(myCss);
 
   var pending = - 1;
   var fetched = 0;
@@ -136,7 +140,7 @@
             
             delay(1500).then(() =>{
               genBreadCrumbCode();
-              $('#edit_wikipage_title_container').append('<a href="javascript:void(0)" id="breadcrumb" class="btn" style="float:right;clear:both;"> Get breadcrum code</a><p>&nbsp;</p>');
+              $('#edit_wikipage_title_container').append('<a href="javascript:void(0)" id="breadcrumb" class="btn" style="float:right;clear:both;"> Insert breadcrum code</a><p>&nbsp;</p>');
               $('#breadcrumb').on('click', {
                 type: 1
               }, getBreadcrumb);
@@ -152,7 +156,7 @@
     //let titleAr = document.title.split(":");
     //titleAr.pop();
     //let title = titleAr.join(":").trim();
-    let title = jQuery('#TextInput_0').val().trim();
+    let title = jQuery('#wikipage-title-input').val().trim();
     let found = -1;
     let pageAt = 0;
     let resultHtml = '';
@@ -269,7 +273,9 @@
 
   function getBreadcrumb(){
     if (debug) console.log( { breadCrumbCode } );
+    insertBreadCrumb();
     ///if ($('#breadcrumbCode').length === 0) {
+    /*  
         $('body').append('<div id="breadcrumbContainer"><div id="breadcrumbDiv"></div>');
         jQuery( "#breadcrumbDiv" ).html( breadCrumbCode );
         //jQuery( "#breadcrumbCode" ).val( breadCrumbCode );
@@ -284,6 +290,7 @@
               }
          }
         );
+      */
    // }
 
   }
@@ -352,4 +359,3 @@
     console.log(e.name + ': ' + e.message);
   }
 }) ();
-
