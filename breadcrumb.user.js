@@ -145,7 +145,7 @@
                 btnMsg = 'Update breadcrumb code';
               }
               genBreadCrumbCode();
-              $('#edit_wikipage_title_container').append(`<a href="javascript:void(0)" id="breadcrumb" class="btn" style="float:right;clear:both;"> ${btnMsg}</a><p>&nbsp;</p>`);
+              $('#edit_wikipage_title_container').append(`<a href="javascript:void(0)" id="breadcrumb" class="btn" style="float:right;clear:both;"> ${btnMsg}</a><span id="bmsg" popover="manual"></span><p>&nbsp;</p>`);
               $('#breadcrumb').on('click', {
                 type: 1
               }, getBreadcrumb);
@@ -349,7 +349,13 @@
       }
 
     }
-
+    jQuery("#bmsg").html("Breadcrumb updated");
+    
+    let popover = document.getElementById('bmsg');
+    popover.showPopover();
+    setTimeout(() => {
+      popover.hidePopover();
+    }, 2000);
     //tinyMCE.execCommand('mceInsertContent', false, breadCrumbCode);
   }
   function copyClipboard() {
