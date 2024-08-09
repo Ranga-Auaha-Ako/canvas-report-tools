@@ -8,7 +8,7 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @resource     REMOTE_CSS https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-1682390572.css
-// @version     0.7
+// @version     0.71
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
 // ==/UserScript==
@@ -45,10 +45,7 @@
   addGetBreadcrumbLink();
 
   function addGetBreadcrumbLink() {
-
-
-        generateBreadCrumbCode()
-
+    generateBreadCrumbCode()
     return;
   }
 
@@ -140,10 +137,13 @@
             //getModuleItems( );
             
             delay(1500).then(() =>{
-              let selection = tinyMCE.activeEditor.dom.select('div[id="breadcrumbDiv"]')[0];
-              if ( selection ){
-                btnMsg = 'Update breadcrumb code';
-              }
+              try{
+                let selection = tinyMCE.activeEditor.dom.select('div[id="breadcrumbDiv"]')[0];
+                if ( selection ){
+                  btnMsg = 'Update breadcrumb code';
+                }
+              } catch(e){}
+              
               genBreadCrumbCode();
               $('#edit_wikipage_title_container').append(`<a href="javascript:void(0)" id="breadcrumb" class="btn" style="float:right;clear:both;"> ${btnMsg}</a><span id="bmsg" popover="manual"></span><p>&nbsp;</p>`);
               $('#breadcrumb').on('click', {
