@@ -80,7 +80,7 @@
   "Accounting and Finance":"Business and Economics",
   "Architecture and Planning":"Creative Arts and Industries",
   "Biological Sciences":"Science",
-  "Business & Economics":"Business & Economics",
+  "Business and Economics":"Business and Economics",
   "Chemical and Materials Engineering":"Engineering",
   "Chemical Sciences":"Science",
   "Civil and Environmental Engineering":"Engineering",
@@ -92,7 +92,7 @@
   "Dance Studies Programme":"Creative Arts and Industries",
   "Economics":"Business and Economics",
   "Creative Arts & Industries":"Creative Arts and Industries",
-  "Education & Social Work":"Education",
+  "Education and Social Work":"Education",
   "Electrical and Computer Engineering":"Engineering",
   "Engineering":"Engineering",
   "Engineering Science":"Engineering",
@@ -666,6 +666,7 @@
         }
         
         tmpAccountName = course.accountName.split( ' (')[0].replace( '– AucklandOnline', '' ).replace( '– Manual', '' ).replace( "TFC-", "").trim();
+        tmpAccountName = tmpAccountName.replace( "&", "and" );
         if (tmpAccountName in faculties){
           tmpFaculty = faculties[ tmpAccountName ];
         } else {
