@@ -70,7 +70,7 @@
   'https://apac.udoit3.ciditools.com/api/admin/courses/account/1/term/{termId}?subaccounts=true' 
  ];
 
-  var faculties = {
+ var faculties = {
   "Arts":"Arts",
   "Humanities":"Arts",
   "Social Sciences":"Arts",
@@ -81,7 +81,7 @@
   "Accounting and Finance":"Business and Economics",
   "Architecture and Planning":"Creative Arts and Industries",
   "Biological Sciences":"Science",
-  "Business & Economics":"Business & Economics",
+  "Business and Economics":"Business and Economics",
   "Chemical and Materials Engineering":"Engineering",
   "Chemical Sciences":"Science",
   "Civil and Environmental Engineering":"Engineering",
@@ -90,10 +90,10 @@
   "Counselling, Human Services and Social Work":"Arts",
   "Critical Studies in Education":"Education",
   "Curriculum and Pedagogy":"Education",
-  "Creative Arts & Industries":"Creative Arts and Industries",
   "Dance Studies Programme":"Creative Arts and Industries",
   "Economics":"Business and Economics",
-  "Education & Social Work":"Education",
+  "Creative Arts & Industries":"Creative Arts and Industries",
+  "Education and Social Work":"Education",
   "Electrical and Computer Engineering":"Engineering",
   "Engineering":"Engineering",
   "Engineering Science":"Engineering",
