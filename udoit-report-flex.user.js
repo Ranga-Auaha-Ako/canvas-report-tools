@@ -91,6 +91,7 @@
   "Curriculum and Pedagogy":"Education",
   "Dance Studies Programme":"Creative Arts and Industries",
   "Economics":"Business and Economics",
+  "Creative Arts & Industries":"Creative Arts and Industries",
   "Education & Social Work":"Education",
   "Electrical and Computer Engineering":"Engineering",
   "Engineering":"Engineering",
@@ -391,7 +392,7 @@
       // date, errors, suggestions, content fixed, content resolved, courses
       let reportData = genReportsAr();
       let tmpWs = XLSX.utils.json_to_sheet( reportData  );
-      XLSX.utils.book_append_sheet( wb, tmpWs, "Reports" );
+      //XLSX.utils.book_append_sheet( wb, tmpWs, "Reports" );
 
       let issueData = genIssuesAr();
       tmpWs = XLSX.utils.json_to_sheet( issueData  );
@@ -410,7 +411,7 @@
         'type': 'application/octet-stream'
       });
 
-      let savename = '2022/2023 UDOIT Reports' +'-' + today + '.xlsx';
+      let savename = '2023/24 UDOIT Reports' +'-' + today + '.xlsx';
       saveAs(blob, savename);
 
       $('#download-report').one('click', {
