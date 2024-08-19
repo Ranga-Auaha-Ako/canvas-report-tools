@@ -10,7 +10,7 @@
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/xlsx.full.min.js
 // @require     https://github.com/Ranga-Auaha-Ako/canvas-report-tools/raw/master/udoit-report-flex.user.js
 // @resource    REMOTE_CSS https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-1682390572.css
-// @version     0.5
+// @version     0.6
 // @grant       GM_getResourceText
 // @grant       GM_addStyle
 // ==/UserScript==
@@ -51,8 +51,9 @@
 } ;
   //var termsAr = [ "230", "231", "234", "241", "243" ];
   //var termsAr = [ "1","71","106", "108","111", "217", "218", "222", "228", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251" ]; // make it shorter, just for quicker test purpose
-  var termsAr = [ "1", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251", "252", "253", "355", "356", "357" ]; // make it shorter, just for quicker test purpose
-  //var termsAr = [ "231" ]; // make it shorter, just for quicker test purpose
+  //var termsAr = [ "1", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251", "252", "253", "355", "356", "357" ]; // make it shorter, just for quicker test purpose
+  var termsAr = [ "250","251", "252", "253", "355", "356", "357" ];
+  
   var termIndex = -1;
   var tokenId = getToken();
   //global array to collect reports, issues, file_issues, actions
