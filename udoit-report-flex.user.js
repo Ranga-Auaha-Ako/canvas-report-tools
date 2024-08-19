@@ -9,7 +9,7 @@
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/xlsx.full.min.js
 // @resource    REMOTE_CSS https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-1682390572.css
-// @version     0.5
+// @version     0.6
 // @grant       GM_getResourceText
 // @grant       GM_addStyle
 // ==/UserScript==
@@ -50,7 +50,8 @@
 } ;
   //var termsAr = [ "230", "231", "234", "241", "243" ];
   //var termsAr = [ "1","71","106", "108","111", "217", "218", "222", "228", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251" ]; // make it shorter, just for quicker test purpose
-  var termsAr = [ "1", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251", "252", "253", "355", "356", "357" ]; // make it shorter, just for quicker test purpose
+  //var termsAr = [ "1", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251", "252", "253", "355", "356", "357" ]; // make it shorter, just for quicker test purpose
+  var termsAr = [ "250","251", "252", "253", "355", "356", "357" ];
   //var termsAr = [ "231" ]; // make it shorter, just for quicker test purpose
   var termIndex = -1;
   var tokenId = getToken();
@@ -137,7 +138,8 @@
   var mm = today.getMonth() + 1;
   var yyyy = today.getFullYear();
 
-  var debug = 1;
+  var debug = 0;
+  var debugCourse = 0;
   var debugDate = 0;
   var debugReport = 0;
   if (dd < 10) {
@@ -193,7 +195,8 @@
           if (i > - 1) {
             ajaxPool.splice(i, 1);
           }
-        }
+        },
+        'timeout': 360000
       });
     } catch (e) {
       throw new Exception('Error configuring AJAX pool');
@@ -226,7 +229,7 @@
       if (debug) console.log( {actionsAr} );
       if (debug) console.log( {issuesAr} );
       if (debug) console.log( {file_issuesAr} );
-      if (debug) console.log( {coursesAr} );
+      if (debugCourse) console.log( {coursesAr} );
       //deal with report
       //each report array in own worksheet
       generateReports();
@@ -256,6 +259,9 @@
     let url = urlAr[0].replace('{termId}', termId );
     fetched++;
     progressbar( fetched, needsFetched );
+    $.ajaxSetup({
+      timeout: 360000 //Time in milliseconds
+    });
     $.getJSON(url, function (udata, status, jqXHR) {
       if (debug) console.log( {udata} );
       if ( udata.data ) {
@@ -280,6 +286,9 @@
     let url = urlAr[1].replace('{termId}', termId );
     fetched++;
     progressbar( fetched, needsFetched );
+    $.ajaxSetup({
+      timeout: 360000 //Time in milliseconds
+    });
     $.getJSON(url, function (udata, status, jqXHR) {
       if (debug) console.log( {udata} );
       if ( udata.data ) {
@@ -298,6 +307,9 @@
     let url = urlAr[2].replace('{termId}', termId );
     fetched++;
     progressbar( fetched, needsFetched );
+    $.ajaxSetup({
+      timeout: 360000 //Time in milliseconds
+    });
     $.getJSON(url, function (udata, status, jqXHR) {
       if (debug) console.log( {udata} );
       if ( udata.data ) {
@@ -315,6 +327,9 @@
     let url = urlAr[3].replace('{termId}', termId );
     fetched++;
     progressbar( fetched, needsFetched );
+    $.ajaxSetup({
+      timeout: 360000 //Time in milliseconds
+    });
     $.getJSON(url, function (udata, status, jqXHR) {
       if (debug) console.log( {udata} );
       if ( udata.data ) {
@@ -333,6 +348,9 @@
     let url = urlAr[4].replace('{termId}', termId );
     fetched++;
     progressbar( fetched, needsFetched );
+    $.ajaxSetup({
+      timeout: 360000 //Time in milliseconds
+    });
     $.getJSON(url, function (udata, status, jqXHR) {
       if (debug) console.log( {udata} );
       if ( udata.data ) {
