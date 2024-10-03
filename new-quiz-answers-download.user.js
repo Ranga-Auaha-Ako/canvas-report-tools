@@ -8,7 +8,6 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/xlsx.full.min.js
-// @require     https://github.com/Ranga-Auaha-Ako/canvas-report-tools/raw/refs/heads/master/new-quiz-answers-download.user.js
 // @resource     REMOTE_CSS https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-1682390572.css
 // @version     0.3
 // @grant        GM_getResourceText
