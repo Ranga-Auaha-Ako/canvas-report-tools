@@ -2,14 +2,14 @@
 // @name        Canvas new quizzes student answers download
 // @author      WenChen Hol
 // @namespace   https://github.com/clearnz/canvas-report-tools/
-// @description Canvas new quizzes student answers downloa
+// @description Canvas new quizzes student answers download
 // @match      https://auckland.quiz-lti-syd-prod.instructure.com/lti/launch
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/xlsx.full.min.js
 // @resource     REMOTE_CSS https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-1682390572.css
-// @version     0.3
+// @version     0.31
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
 // @grant        unsafeWindow
@@ -521,7 +521,11 @@
         
         tmpField = titleAr[i];
         console.log( "generateReports:", tmpObj[ tmpField ], {tmpField} );
-        tmpReportData[tmpField] = tmpObj[ tmpField ]?tmpObj[ tmpField ]:"";
+        if ( tmpField.includes( '(score)' ) ){
+          tmpReportData[tmpField] = tmpObj[ tmpField ]?tmpObj[ tmpField ]:0;
+        } else {
+          tmpReportData[tmpField] = tmpObj[ tmpField ]?tmpObj[ tmpField ]:"";
+        }
       }
       
       console.log( {tmpReportData} );
