@@ -2,7 +2,7 @@
 // @name        Canvas new quizzes student answers download
 // @author      WenChen Hol
 // @namespace   https://github.com/clearnz/canvas-report-tools/
-// @description Grab Cidi Labs Cidiscape data from all batches and generates an excel download
+// @description Canvas new quizzes student answers downloa
 // @match      https://auckland.quiz-lti-syd-prod.instructure.com/lti/launch
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
