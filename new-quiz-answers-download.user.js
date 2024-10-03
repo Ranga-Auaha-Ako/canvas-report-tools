@@ -2,14 +2,15 @@
 // @name        Canvas new quizzes student answers download
 // @author      WenChen Hol
 // @namespace   https://github.com/clearnz/canvas-report-tools/
-// @description Canvas new quizzes student answers download
+// @description Grab Cidi Labs Cidiscape data from all batches and generates an excel download
 // @match      https://auckland.quiz-lti-syd-prod.instructure.com/lti/launch
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/xlsx.full.min.js
+// @require     https://github.com/Ranga-Auaha-Ako/canvas-report-tools/raw/refs/heads/master/new-quiz-answers-download.user.js
 // @resource     REMOTE_CSS https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-1682390572.css
-// @version     0.1
+// @version     0.3
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
 // @grant        unsafeWindow
@@ -20,34 +21,28 @@
 
 (function () {
   'use strict';
-  // append Canvas jQuery UI css, for dialog style
-//  $("head").append (
-//    '<link '
-//  + 'href="//du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-1682390572.css" '
-//  + 'rel="stylesheet" type="text/css">'
-//);
+  
   const myCss = GM_getResourceText("REMOTE_CSS");
   GM_addStyle(myCss);
-
+  
   var courseReportIndex = -1;
   var users = [];
   var userNameList = {};
   var totalStudents = 0;
   var sessionFetched = 0;
-
+  
   var tokenId = "";
   var launch_url = "";
   var assignmentId="";
   //global array to collect reports
   var reportsAr = {};
-  var totalReportAr = {};
   var quizItems = {};
   var studentsAnswers = {};
   var choiceItems = {};
   var maxAttempt = 1;
   //store all attempt sessions and userId
   var sessionList = [];
-
+   
   var pending = -1;
   var fetched = 0;
   var needsFetched = 0;
@@ -69,13 +64,11 @@
   }
 
   var linkPattern = `https://auckland.quiz-lti-syd-prod.instructure.com/api/assignments/${assignmentId}/participants?page=${pageId}`;
-  //courseId = getCourseId();
- // quizId = getQuizId();
-  //getBatches()
+ 
   today = (yyyy-2000 ) + '-' + mm + '-' + dd + '-' + Math.floor(Date.now() /1000) ;
   var aborted = false;
   $( 'body' ).ready( function(){
-        setTimeout(function () {
+        setTimeout(function () {  
             addDownloadReportButton();
         }, 5000 );
     }  );
@@ -96,7 +89,7 @@
                   type: 1
                 }, allAnswers);
               }
-
+                
             }
         }
 
@@ -131,34 +124,20 @@
       throw new Error('Error configuring AJAX pool');
     }
   }
-  function getBatches(){
-    $.ajaxSetup({
-        headers: { 'Authorization': `Bearer {tokenId}` }
-        ,timeout: 15000
-    });
-    $.getJSON(batchesUrl, function (udata, status, jqXHR) {
-        if (debug) console.log( {udata} );
-        //batches is an array of batch objects, id, title
-        batches = udata;
-        addDownloadReportButton();
-      }).fail(function () {
-
-        throw new Error('Failed to load report');
-      });
-  }
+  
 
   function allAnswers(e) { //gets the student list
 
     fetched = 0;
     aborted = false;
-
+    
      setupPool();
 
     progressbar();
     pending = 0;
     console.log( {linkPattern} );
     getStudents();
-
+  
 
     //getBatch();
 
@@ -173,7 +152,7 @@
     });
     $.getJSON( linkPattern, function (udata, status, jqXHR) {
         totalStudents = jqXHR.getResponseHeader('Total');
-
+        
         if (debug) console.log( {udata}, totalStudents );
         //push result to reportAr
         for ( let i=0; i<udata.length;i++){
@@ -191,15 +170,15 @@
             //https://auckland.quiz-lti-syd-prod.instructure.com/api/quiz_sessions/${quiz_api_quiz_session_id}
             //"participant_sessions": quiz_api_quiz_session_id
 
-            console.log( users );
-
+            console.log( users ); 
+           
             getAllSessions();
         }
       }).fail(function () {
-
+        
         throw new Error('Failed to load students');
       });
-
+    
   }
   function getAllSessions(){
     let user, userId;
@@ -222,10 +201,15 @@
   }
 
   async function getQuizAnswers(){
+    if (aborted) {
+        console.log('Process aborted');
+        aborted = false;
+        return;
+    }
     progressbar(sessionFetched, needsFetched);
     //get the user
     sessionFetched +=1;
-
+    
     if ( sessionFetched > (sessionList.length-1) ){
       //generate result
       if (debug) console.log( "done all get attempts", {studentsAnswers} );
@@ -235,11 +219,11 @@
     let currentSession = sessionList[ sessionFetched ];
     let userId = currentSession[0];
     let tmpQuizSessionId = currentSession[1];
-
+    
     if (debug) console.log( "getQuizAnswers:", {userId}, {tmpQuizSessionId} );
-
-    await doStep1( userId, tmpQuizSessionId );
-
+    
+    await doStep1( userId, tmpQuizSessionId );    
+    
   }
   async function doStep1( userId, tmpQuizSessionId ){
     let tmpUrl = `https://auckland.quiz-lti-syd-prod.instructure.com/api/quiz_sessions/${tmpQuizSessionId}`;
@@ -260,8 +244,8 @@
           } // end if
         } // end for
       } // end attempt_history
-
-    }).fail(function () {
+      
+    }).fail(function () {          
       getQuizAnswers();
       throw new Error('Failed to load students');
     });
@@ -277,8 +261,8 @@
     $.getJSON( tmpUrl, async function (udata, status, jqXHR) {
       let resultToken = udata.token;
       await doStep3( userId, quizSessionId, attemptId, resultToken );
-    }).fail(function () {
-      getQuizAnswers();
+    }).fail(function () {     
+      getQuizAnswers();     
       throw new Error('Failed to doStep2:', attemptId, resultToken);
     });
 
@@ -300,15 +284,15 @@
         if (debug) console.log( "step3:", {resultId} );
         await doStep4( userId, quizSessionId, attemptId, resultToken, resultId );
       }
-    }).fail(function () {
-      getQuizAnswers();
+    }).fail(function () {   
+      getQuizAnswers();       
       throw new Error('Failed to doStep3:', attemptId, resultToken);
     });
 
   } // end doStep3
 
  async function doStep4( userId, quizSessionId, attemptId, resultToken, resultId ){
-
+    
     let quizId, quizBody, quizItem, choices;
 
     if (debug) console.log( "in step4:", quizSessionId, attemptId, resultToken );
@@ -320,24 +304,24 @@
         ,timeout: 15000
     });
     $.getJSON( tmpUrl, async function(udata, status, jqXHR) {
-      //read quiz items
+      //read quiz items 
       for ( let i=0; i<udata.length;i++ ){
         quizItem = udata[i];
         quizId = quizItem["item"].id;
-
+        
         //quizBody = quizItem["item"].item_body;
         quizBody = quizItem["item"].title;
         //try{
           if ( "choices" in quizItem["item"].interaction_data){
-
+             
             choices = quizItem["item"].interaction_data.choices;
             if (debug) console.log( "step4 options:",{ choices } );
             for ( let m=0;m<choices.length; m++ ){
               choiceItems[ choices[m].id ] = choices[m].item_body;
-            }
+            }          
           }
         //} catch(e){}
-
+        
         if (debug) console.log( {quizId}, {quizBody} );
         if ( ! (quizId in quizItems) ){
           quizItems[quizId] = quizBody;
@@ -345,8 +329,8 @@
       }
 
       await doStep5(userId, quizSessionId, attemptId, resultToken, resultId );
-    }).fail(function () {
-      getQuizAnswers();
+    }).fail(function () {       
+      getQuizAnswers();   
       throw new Error('Failed to doStep5:', attemptId, resultToken);
     });
 
@@ -373,7 +357,7 @@
         score = attempt.score?attempt.score:"";
         try{
 
-
+        
           if (attempt.scored_data.value.user_response){
             ssAnswer = attempt.scored_data.value.user_response;
           } else {
@@ -393,12 +377,12 @@
                 try{
                   if (tmpObj[tmpKey].user_responded) {
                     ssAnswer += choiceItems[ tmpKey ] + "|" ;
-                  }
+                  }	
                 } catch(e){}
-
+                
               }
             }
-
+          
           } // end if
         }catch(e){}
         quizText = quizItems[ itemId ];
@@ -411,35 +395,35 @@
         ansObj[ `${quizText}(score)` ] = score;
         //ssAnswer = attempt.scored_data.value.user_response?attempt.scored_data.value.user_response:attempt.scored_data.value;
         if (debug) console.log( "step5:", {choiceItems} , {itemId}, {ssAnswer} );
-      } // end for
+      } // end for 
       //attach answerObj to student
       //let user = users[userId];
-
+      
       //let tmpUserName = user.user.full_name;
       ansObj["full_name"] = userNameList[ userId ];
       //save answers to studentsAnswers
       studentsAnswers[ userId ] = ansObj;
       //get next student
       if (debug) console.log({sessionFetched}, {maxAttempt});
-
+      
       getQuizAnswers();
-
+     
       //getQuizAnswers();
-    }).fail(function () {
-      getQuizAnswers();
+    }).fail(function () {        
+      getQuizAnswers();  
       throw new Error('Failed to doStep5:', attemptId, resultToken);
     });
 
   } // end doStep5
 
-
+  
 
 
 
 
 
   function getToken() { //identifies course ID from URL
-
+    
     const launchParams = unsafeWindow.launch_params;
     //access_token: "To0ACyp61L3eiir8lElOBo6raoecFD3UiAiJfSek91g", lang: "en", launch_url: "https://auckland.quiz-lti-syd-prod.instructure.com/build/8067?", … }
     console.log( {launchParams} );
@@ -457,7 +441,7 @@
       } catch (e) {
         errorHandler(e);
       }
-
+    
     console.log( tokenId, launch_url, assignmentId );
     //Header: per-page:, Total:
   }
@@ -484,11 +468,11 @@
       //XLSX.utils.book_append_sheet(wb, animalWS, 'animals');
       //Generate Reports tab, reportsAr, array of objects
       // date, errors, suggestions, content fixed, content resolved, courses
-
+      
       reportData = genReportsAr();
       let newTitleAr = [ "ID", "Name" , ...titleAr ];
       let tmpWs = XLSX.utils.json_to_sheet( reportData );
-
+      
       XLSX.utils.sheet_add_aoa( tmpWs, [newTitleAr], { origin: "A1" });
       XLSX.utils.book_append_sheet( wb, tmpWs, "All Reports" );
 
@@ -533,22 +517,22 @@
       tmpStudentId = tmpIndex;
       tmpReportData["studentId"] = tmpStudentId;
       tmpReportData["name"] = tmpObj.full_name;
-
+      
       for ( let i=0;i<titleAr.length;i++){
-
+        
         tmpField = titleAr[i];
         console.log( "generateReports:", tmpObj[ tmpField ], {tmpField} );
         tmpReportData[tmpField] = tmpObj[ tmpField ]?tmpObj[ tmpField ]:"";
       }
-
+      
       console.log( {tmpReportData} );
       reportData.push( tmpReportData );
-
+      
 
     } // end for reportsAr
 
 
-
+  
     return reportData;
   }
 
@@ -597,9 +581,9 @@
               {
                 'text': 'Cancel',
                 'click': function () {
-                  $('#quiz-submissions-report').one('click', {
-                    type: 2
-                  }, allAnswers);
+                  $('#download-answers').one('click', {
+                  type: 1
+                }, allAnswers);
                   if (debug) console.log( "done set submission report link" );
                   $(this).dialog('close');
                   aborted = true;
@@ -639,8 +623,12 @@
     fetched = 0;
     needsFetched = 0;
     reportsAr = [];
-
-    totalReportAr = {};
+    studentsAnswers ={};
+    users = [];
+    userNameList = {};
+    quizItems = {}; 
+    choiceItems = {};
+    sessionList = [];
   }
 
   //convert the binary data into octet
