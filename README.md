@@ -2,6 +2,9 @@
 screen captures and description of each script, see the google doc here
 https://docs.google.com/document/d/1dmobz9ydJ862uUyFe8feYz5wceqBu4u-WDUTeKxWKd0/
 
+Canvas new quizzes student answers download script: [ https://github.com/Ranga-Auaha-Ako/canvas-report-tools/raw/refs/heads/master/newQuiz-answers-loader.user.js ]
+For Canvas new quizzes, download student answers for manual marking or text analysis purposes. 
+
 Canvas assignment score,comment import script: for assignment grade, comment import. Some teachers may use external tools for the marking and feedback. This script help import grade and comment into Canvas gradebook.
 
 course-progress.user.js: for module progress report 
