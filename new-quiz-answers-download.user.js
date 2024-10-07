@@ -9,7 +9,7 @@
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/xlsx.full.min.js
 // @resource     REMOTE_CSS https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-1682390572.css
-// @version     0.31
+// @version     0.3
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
 // @grant        unsafeWindow
@@ -469,7 +469,7 @@
       // date, errors, suggestions, content fixed, content resolved, courses
       
       reportData = genReportsAr();
-      let newTitleAr = [ "ID", "Name" , ...titleAr ];
+      let newTitleAr = [ "Student ID", "Name" , ...titleAr ];
       let tmpWs = XLSX.utils.json_to_sheet( reportData );
       
       XLSX.utils.sheet_add_aoa( tmpWs, [newTitleAr], { origin: "A1" });
