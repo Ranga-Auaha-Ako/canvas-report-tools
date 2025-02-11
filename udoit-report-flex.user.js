@@ -9,7 +9,7 @@
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/xlsx.full.min.js
 // @resource    REMOTE_CSS https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-1682390572.css
-// @version     0.6
+// @version     0.7
 // @grant       GM_getResourceText
 // @grant       GM_addStyle
 // ==/UserScript==
@@ -51,7 +51,7 @@
   //var termsAr = [ "230", "231", "234", "241", "243" ];
   //var termsAr = [ "1","71","106", "108","111", "217", "218", "222", "228", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251" ]; // make it shorter, just for quicker test purpose
   //var termsAr = [ "1", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251", "252", "253", "355", "356", "357" ]; // make it shorter, just for quicker test purpose
-  var termsAr = [ "250","251", "252", "253", "355", "356", "357" ];
+  var termsAr = [ "250","251", "252", "253", "355", "356", "357", "358", "360", "361", "362", "363", "365" ];
   //var termsAr = [ "231" ]; // make it shorter, just for quicker test purpose
   var termIndex = -1;
   var tokenId = getToken();
@@ -161,7 +161,7 @@
       //try {
         if ( tokenId!=null ){
             if ($('#download-report').length === 0) {
-                $('.css-e4i4eu-truncateList-appNav__list').append('<li class="css-166z3xu-truncateList__listItem"><button dir="ltr" id="download-report" cursor="pointer" class="css-13npier-view--flex-item"><span class="css-1f9ldn1-item__label">Download 2023/24 Reports</span></button></li>');
+                $('.css-e4i4eu-truncateList-appNav__list').append('<li class="css-166z3xu-truncateList__listItem"><button dir="ltr" id="download-report" cursor="pointer" class="css-13npier-view--flex-item"><span class="css-1f9ldn1-item__label">Download 2023/24/25 Reports</span></button></li>');
                 
                 $('#download-report').one('click', {
                   type: 1
