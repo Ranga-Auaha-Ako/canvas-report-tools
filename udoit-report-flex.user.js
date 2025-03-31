@@ -9,7 +9,7 @@
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/xlsx.full.min.js
 // @resource    REMOTE_CSS https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-1682390572.css
-// @version     0.7
+// @version     0.8
 // @grant       GM_getResourceText
 // @grant       GM_addStyle
 // ==/UserScript==
@@ -701,7 +701,85 @@
         tmpCourses["Content Fixed"] = course.report.contentFixed;
         tmpCourses["Content Resolved"] = course.report.contentResolved;
         tmpCourses["Files Reviewed"] = course.report.filesReviewed;
+        tmpCourses["AnchorSuspiciousLinkText"]  = 0;
+        tmpCourses["HeadersHaveText"] = 0;
+        tmpCourses["HeadingsInOrder"] = 0;
+        tmpCourses["VideoEmbedCheck"] = 0;
+        tmpCourses["IframeNotHandled"] = 0;
+        tmpCourses["ContentTooLong"] = 0;
+        tmpCourses["NoHeadings"] = 0;
+        tmpCourses["TableDataShouldHaveTableHeader"] = 0;
+        tmpCourses["TableHeaderShouldHaveScope"] = 0;
+        tmpCourses["PreShouldNotBeUsedForTabularValues"] = 0;
+        tmpCourses["CssTextHasContrast"] = 0;
+        tmpCourses["CssTextStyleEmphasize"] = 0;
+        tmpCourses["ImageHasAltDecorative"] = 0;
+        tmpCourses["ImageHasAlt"] = 0;
+        tmpCourses["ImageAltNotPlaceholder"] = 0;
+        tmpCourses["ImageAltIsDifferent"] = 0;
+        tmpCourses["ImageAltIsTooLong"] = 0;
+        tmpCourses["ParagraphNotUsedAsHeader"] = 0;
         ////////////////////////
+        //look into ruleSetData for detail error
+        if ( 'rulesetData' in course.report ) {
+          //
+          if (course?.report?.rulesetData?.Links?.ruleData?.AnchorSuspiciousLinkText) {
+              tmpCourses["AnchorSuspiciousLinkText"] = course.report.rulesetData.Links.ruleData.AnchorSuspiciousLinkText.checks-course.report.rulesetData.Links.ruleData.AnchorSuspiciousLinkText.passed;
+          } 
+          if ( course?.report?.rulesetData?.PageHeadings ) {
+              try{
+                tmpCourses["HeadersHaveText"] = course.report.rulesetData.PageHeadings.ruleData.HeadersHaveText.checks-course.report.rulesetData.PageHeadings.ruleData.HeadersHaveText.passed;
+              
+                tmpCourses["HeadingsInOrder"] = course.report.rulesetData.PageHeadings.ruleData.HeadingsInOrder.checks-course.report.rulesetData.PageHeadings.ruleData.HeadingsInOrder.passed;
+              } catch(e){}
+              
+          } 
+          if (course?.report?.rulesetData?.VideoConnection) {
+            try{
+              tmpCourses["VideoEmbedCheck"] = course.report.rulesetData.VideoConnection.ruleData.VideoEmbedCheck.checks-course.report.rulesetData.VideoConnection.ruleData.VideoEmbedCheck.passed;
+              tmpCourses["IframeNotHandled"] = course.report.rulesetData.VideoConnection.ruleData.IframeNotHandled.checks-course.report.rulesetData.VideoConnection.ruleData.IframeNotHandled.passed;
+            } catch(e) {}
+          } 
+          if (course?.report?.rulesetData?.PageStructure) {
+            try{
+              tmpCourses["ContentTooLong"] = course.report.rulesetData.PageStructure.ruleData.ContentTooLong.checks-course.report.rulesetData.PageStructure.ruleData.ContentTooLong.passed;
+              tmpCourses["NoHeadings"] = course.report.rulesetData.PageStructure.ruleData.NoHeadings.checks-course.report.rulesetData.PageStructure.ruleData.NoHeadings.passed;  
+            }catch(e){}
+          } 
+          if (course?.report?.rulesetData?.StyledHeading) {
+            try{
+              tmpCourses["ParagraphNotUsedAsHeader"] = course.report.rulesetData.StyledHeading.ruleData.ParagraphNotUsedAsHeader.checks-course.report.rulesetData.StyledHeading.ruleData.ParagraphNotUsedAsHeader.passed;
+            }catch(e){}
+          } 
+          
+          if (course?.report?.rulesetData?.Tables) {
+            try{
+              tmpCourses["TableDataShouldHaveTableHeader"] = course.report.rulesetData.Tables.ruleData.TableDataShouldHaveTableHeader.checks-course.report.rulesetData.Tables.ruleData.TableDataShouldHaveTableHeader.passed;
+              tmpCourses["TableHeaderShouldHaveScope"] = course.report.rulesetData.Tables.ruleData.TableHeaderShouldHaveScope.checks-course.report.rulesetData.Tables.ruleData.TableHeaderShouldHaveScope.passed;
+              tmpCourses["PreShouldNotBeUsedForTabularValues"] = course.report.rulesetData.Tables.ruleData.PreShouldNotBeUsedForTabularValues.checks-course.report.rulesetData.Tables.ruleData.PreShouldNotBeUsedForTabularValues.passed;
+            }catch(e){}
+          } 
+          if (course?.report?.rulesetData?.Color) {
+            try{
+              tmpCourses["CssTextHasContrast"] = course.report.rulesetData.Color.ruleData.CssTextHasContrast.checks-course.report.rulesetData.Color.ruleData.CssTextHasContrast.passed;
+              tmpCourses["CssTextStyleEmphasize"] = course.report.rulesetData.Color.ruleData.CssTextStyleEmphasize.checks-course.report.rulesetData.Color.ruleData.CssTextStyleEmphasize.passed;      
+            }catch(e){}
+          } 
+          if (course?.report?.rulesetData?.Images) {
+            try{
+              tmpCourses["ImageHasAltDecorative"] = course.report.rulesetData.Images.ruleData.ImageHasAltDecorative.checks-course.report.rulesetData.Images.ruleData.ImageHasAltDecorative.passed;    
+              tmpCourses["ImageHasAlt"] = course.report.rulesetData.Images.ruleData.ImageHasAlt.checks-course.report.rulesetData.Images.ruleData.ImageHasAlt.passed;    
+              tmpCourses["ImageAltNotPlaceholder"] = course.report.rulesetData.Images.ruleData.ImageAltNotPlaceholder.checks-course.report.rulesetData.Images.ruleData.ImageAltNotPlaceholder.passed; 
+              tmpCourses["ImageAltIsDifferent"] = course.report.rulesetData.Images.ruleData.ImageAltIsDifferent.checks-course.report.rulesetData.Images.ruleData.ImageAltIsDifferent.passed; 
+              tmpCourses["ImageAltIsTooLong"] = course.report.rulesetData.Images.ruleData.ImageAltIsTooLong.checks-course.report.rulesetData.Images.ruleData.ImageAltIsTooLong.passed; 
+            }catch(e){}
+                        
+          } 
+          
+          
+        }
+
+        //////
         coursesData.push( tmpCourses );
       }
     } //  end for coursesAr
