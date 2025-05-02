@@ -72,15 +72,15 @@
     //https://canvas.auckland.ac.nz:443/api/v1/courses/29897/quizzes/25662/submissions?include[]=user
       //try {
         if ($('#remote-ip-report').length === 0) {
-          if (jQuery( '#sidebar_content')){
+          if (jQuery( '#sidebar_content').length){
             $('#sidebar_content').append(
               '<span><a href="javascript:void(0)" id="remote-ip-report" class="ui-corner-all" role="menuitem"><i class="icon-analytics"></i> Student remote ip information Download</a></span>'
               );
           } else {
-            if ($('.css-q235k2').length){
-              $('.css-q235k2').before('<div class="css-q235k2"><a href="javascript:void(0)" id="remote-ip-report" class="css-1as0scj-view--inlineBlock-baseButton">RemoteIP</a></div>');
-              
+            if (jQuery( '.tool_content_wrapper').length){
+              jQuery( '.tool_content_wrapper').before('<div class="css-q235k2"><a href="javascript:void(0)" id="remote-ip-report" class="css-1as0scj-view--inlineBlock-baseButton">RemoteIP report</a></div>');
             }
+            
           }
            
           $('#remote-ip-report').one('click', {
