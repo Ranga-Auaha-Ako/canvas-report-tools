@@ -2,14 +2,14 @@
 // @name        UDOIT reports download
 // @author      WenChen Hol
 // @namespace   https://github.com/clearnz/canvas-report-tools/
-// @description Grab udoit admin data from all semesters and generates a .CSV download 
+// @description Grab udoit admin data from all semesters and generates a .CSV download
 // @include     https://*.ciditools.com/admin*
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/xlsx.full.min.js
 // @resource    REMOTE_CSS https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-1682390572.css
-// @version     0.8
+// @version     0.7
 // @grant       GM_getResourceText
 // @grant       GM_addStyle
 // ==/UserScript==
@@ -22,13 +22,13 @@
 
   const myCss = GM_getResourceText("REMOTE_CSS");
   GM_addStyle(myCss);
-  
+
   // to combine 2022, 2023: term id: 234, 231, 230, 243, 241
 
   var terms = {
     "243": "2023 Semester One",
     "242": "2023 Academic Year Term",
-    "241": "2023 Quarter One",  
+    "241": "2023 Quarter One",
     "234": "2022 Semester Two",
     "244": "2023 Quarter Two",
     "240": "2023 Summer School",
@@ -51,7 +51,24 @@
   //var termsAr = [ "230", "231", "234", "241", "243" ];
   //var termsAr = [ "1","71","106", "108","111", "217", "218", "222", "228", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251" ]; // make it shorter, just for quicker test purpose
   //var termsAr = [ "1", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251", "252", "253", "355", "356", "357" ]; // make it shorter, just for quicker test purpose
-  var termsAr = [ "250","251", "252", "253", "355", "356", "357", "358", "360", "361", "362", "363", "365" ];
+  //var termsAr = [ "250","251", "252", "253", "355", "356", "357", "358", "360", "361", "362", "363", "365" ];
+  //var termsAr = [ "358", "360", "361", "362", "363", "365" ];
+  //  var termsAr = [ "363" ];
+
+
+  var termsAr = [ 
+  "240", "241", "242", "243", "244", "245", "246", "247", "248", "249",// 2023
+  "250", "251", "252", "253", "254","355", "356", "357",               // 2024
+  "358", "360", "361", "362", "363", "364","365"                       // 2025
+];
+
+ function getYearFromTermId(termId) {
+  if (["240", "241", "242", "243", "244", "245", "246", "247", "248", "249"].includes(termId)) return "2023";
+  if (["250", "251", "252", "253", "254","355", "356", "357", "358"].includes(termId)) return "2024";
+  if (["360", "361", "362", "363", "364", "365"].includes(termId)) return "2025";
+  return "";
+}
+
   //var termsAr = [ "231" ]; // make it shorter, just for quicker test purpose
   var termIndex = -1;
   var tokenId = getToken();
@@ -62,12 +79,12 @@
   var actionsAr = [];
   var coursesAr = [];
   //https://apac.udoit3.ciditools.com/api/admin/courses/account/1/term/253?subaccounts=true
-  var urlAr = [ 
+  var urlAr = [
   'https://apac.udoit3.ciditools.com/api/admin/reports/account/1/term/{termId}?subaccounts=true',
   'https://apac.udoit3.ciditools.com/api/admin/issues/account/1/term/{termId}?subaccounts=true',
   'https://apac.udoit3.ciditools.com/api/admin/file_issues/account/1/term/{termId}?subaccounts=true',
   'https://apac.udoit3.ciditools.com/api/admin/file_actions/account/1/term/{termId}?subaccounts=true',
-  'https://apac.udoit3.ciditools.com/api/admin/courses/account/1/term/{termId}?subaccounts=true' 
+  'https://apac.udoit3.ciditools.com/api/admin/courses/account/1/term/{termId}?subaccounts=true'
  ];
 
   var faculties = {
@@ -125,10 +142,10 @@
   "Statistics":"Science",
   "Te Kupenga Hauora Maori":"FMHS",
   "Te Puna Wananga":"Education"};
-  
+
   //
-  
-  
+
+
   var pending = - 1;
   var fetched = 0;
   var needsFetched = 0;
@@ -149,7 +166,7 @@
     mm = '0' + mm;
   }
   //courseId = getCourseId();
- // quizId = getQuizId(); 
+ // quizId = getQuizId();
 
   today = (yyyy-2000 ) + '-' + mm  + '-' + dd + '-' + Math.floor(Date.now() /1000) ;
   var aborted = false;
@@ -162,13 +179,13 @@
         if ( tokenId!=null ){
             if ($('#download-report').length === 0) {
                 $('.css-e4i4eu-truncateList-appNav__list').append('<li class="css-166z3xu-truncateList__listItem"><button dir="ltr" id="download-report" cursor="pointer" class="css-13npier-view--flex-item"><span class="css-1f9ldn1-item__label">Download 2023/24/25 Reports</span></button></li>');
-                
+
                 $('#download-report').one('click', {
                   type: 1
                 }, allReports);
             }
         }
-        
+
       //} catch(e){}
 
 
@@ -208,16 +225,16 @@
     fetched = 0;
     aborted = false;
     setupPool();
-     
+
     progressbar();
     pending = 0;
     needsFetched = termsAr.length * urlAr.length;
     getReport( );
-    
+
   }
 
   function getReport(){
-    
+
     termIndex++;
     if (debug) console.log( "getting ", {termIndex});
     if ( termIndex< termsAr.length ) {
@@ -234,25 +251,25 @@
       //each report array in own worksheet
       generateReports();
     }
-    
+
   }
 
   function getTerm( termId ) { //cycles through the course list
-    
+
     if (aborted) {
       throw new Error('Aborted');
     }
     jQuery("#doing").html( "Fetching informaton <img src='https://flexiblelearning.auckland.ac.nz/images/spinner.gif'/>" );
-    
+
     $.ajaxSetup({
       headers: { 'x-auth-token': tokenId }
       ,timeout: 15000
     });
-  
-  
+
+
     getReports( termId );
-    
-    
+
+
   }
 
   function getReports( termId ){
@@ -273,13 +290,13 @@
         }
         reportsAr.push( reports );
       }
-      
+
       getIssues( termId );
     }).fail(function () {
       getIssues( termId );
       throw new Error('Failed to load report');
     });
-  
+
   }
 
   function getIssues( termId ){
@@ -355,7 +372,10 @@
       if (debug) console.log( {udata} );
       if ( udata.data ) {
         let courses = udata.data;
-        //console.log( actions ); // actions is an array
+        // Add termId to each course object
+        for (let i = 0; i < courses.length; i++) {
+          courses[i].term = termId;
+        }
         coursesAr.push( courses );
       }
       getReport();
@@ -365,14 +385,14 @@
     });
   }
 
- 
- 
+
+
   function getToken() { //identifies course ID from URL
     var debug = 1;
     let tokenId = null;
     if (debug) console.log( "in getToken: window.location", window.location.href );
-    
-      
+
+
       let matches = window.location.href.split('auth_token=');
       if (debug) console.log(matches);
       if (matches) {
@@ -381,13 +401,13 @@
       } else {
         throw new Error('Unable to detect Course ID');
       }
-    
+
     return tokenId;
   }
 
   function generateReports() {
-    
-    
+
+
     try {
       if (aborted) {
         console.log('Process aborted');
@@ -398,7 +418,7 @@
 
       var wb = XLSX.utils.book_new();
       wb.Props = {
-        Title: "2023/24/25 UDOIT Reports",
+        Title: "2025 UDOIT Reports",
         Subject:"UDOIT Reports",
         Author: "",
         CreatedDate: new Date()
@@ -415,15 +435,15 @@
       let issueData = genIssuesAr();
       tmpWs = XLSX.utils.json_to_sheet( issueData  );
       XLSX.utils.book_append_sheet( wb, tmpWs, "Content issues" );
-      
+
       let fileIssueData = genFileIssuesAr();
       tmpWs = XLSX.utils.json_to_sheet( fileIssueData  );
       XLSX.utils.book_append_sheet( wb, tmpWs, "File issues" );
-      
+
       let coursesData = genCoursesAr();
       tmpWs = XLSX.utils.json_to_sheet( coursesData  );
       XLSX.utils.book_append_sheet( wb, tmpWs, "Courses" );
-      
+
       let wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
       let blob = new Blob([ s2ab(wbout) ], {
         'type': 'application/octet-stream'
@@ -442,26 +462,26 @@
       errorHandler(e);
     }
   }
-  
+
   function genReportsAr(){
     let reportDates = {};
     let maxTermVal = {};
-    
+
     let reportObj;
     let reportData = [];
     let tmpDate;
-    let tmpObj; 
+    let tmpObj;
     let tmpIndex;
     let tmpTermId;
     //let totalCourses = 0;
     for ( let k=0; k < reportsAr.length;k++ ){
       reportObj = reportsAr[k];
-      //if (debugReport) console.log(Object.entries(reportObj)); 
+      //if (debugReport) console.log(Object.entries(reportObj));
       //for ( [tmpDate, tmpObj ] of Object.entries(reportObj)) {
       for ( [tmpIndex, tmpObj ] of Object.entries(reportObj)) {
         tmpDate = tmpObj.created;
         tmpTermId = tmpObj.term;
-        
+
         if ( ! (tmpDate in reportDates) ) {
           reportDates[tmpDate] = {};
           reportDates[tmpDate].date = tmpObj.created;
@@ -481,9 +501,9 @@
         }
         //register for last course count and date for each date
         maxTermVal[ tmpTermId ] = tmpObj;
-        
+
         if (debugReport) console.log(tmpDate, reportDates[tmpDate].courses);
-      } 
+      }
     }
     if (debugDate) console.log( {reportDates}, Object.keys( reportDates ) );
     //sort the reportData
@@ -506,14 +526,16 @@
       }
       ////////////////////////
       //reportDates[dateitem].courses = totalCourses;
+      // Add year column
+      reportDates[dateitem].year = getYearFromTermId(reportDates[dateitem].term || tmpObj.term);
       reportData.push( reportDates[dateitem] );
-      
+
     } //  end for dates
-    
+
     //reportData.sort((a, b) => (a.date > b.date) ? -1 : 1);
     return reportData.reverse();
   }
-  
+
   function genIssuesAr(){
     let issueObjects = {};
     let issueObj, tmpObj;
@@ -562,37 +584,37 @@
         } else {
           if (debug) console.log( {issueName}, "not in issueObjects"  )
           issueObjects[ issueName ] = { ...tmpObj };
-          
+
         }
       }
     }
     //console.log( {issueObjects} );
     let issues = Object.keys( issueObjects );
-    
+
     //console.log( {issues} );
     for ( let k=0; k < issues.length;k++ ){
       let issue = issues[k];
       tmpIssue = {};
-      
+
       tmpObj = issueObjects[issue];
       if ( tmpObj.id in issueMapping ) {
         tmpIssue["Issue"] = issueMapping[ tmpObj.id ];
       } else {
         tmpIssue["Issue"] = tmpObj.id;
       }
-      
+
       tmpIssue["Issue Severity"] = tmpObj.type;
       tmpIssue["Active"] = tmpObj.active;
       tmpIssue["Fixed"] = tmpObj.fixed;
       tmpIssue["Resolved"] = tmpObj.resolved;
       tmpIssue["Courses"] = tmpObj.courses;
       tmpIssue["Total"] = tmpObj.total;
-      
+
       ////////////////////////
       issueData.push( tmpIssue );
-      
+
     } //  end for dates
-    //order by active number 
+    //order by active number
     issueData.sort((a, b) => (a.Active > b.Active) ? -1 : 1);
     return issueData;
   }
@@ -620,7 +642,7 @@
     }
     for ( let k=0; k < file_issuesAr.length;k++ ){
       fileIssueObj = file_issuesAr[k];
-      
+
       for ( [fileIssueName, tmpObj ] of Object.entries(fileIssueObj)) {
         if (debug) console.log( "inFileIssues:", { tmpObj });
         fileIssueName = tmpObj.id;
@@ -632,7 +654,7 @@
         } else {
           if (debug) console.log( {fileIssueName}, " not in fileIssueObjects"  );
           fileIssueObjects[ fileIssueName ] = { ...tmpObj };
-          
+
         }
       }
     }
@@ -649,14 +671,14 @@
       } else {
         tmpFileIssue["Issue"] = tmpObj.fileType.toUpperCase() + ' - ' + tmpObj.id.replaceAll( '.', ' ');
       }
-      
+
       tmpFileIssue["Courses"] = tmpObj.courses;
       tmpFileIssue["Total"] = tmpObj.total;
       ////////////////////////
       fileIssueData.push( tmpFileIssue );
-      
+
     } //  end for dates
-    //order by course number 
+    //order by course number
     fileIssueData.sort((a, b) => (a.Courses > b.Courses) ? -1 : 1);
     return fileIssueData;
   }
@@ -668,7 +690,7 @@
     //console.log( {coursesAr} );
     //coursesAr is array of array
     for ( let k=0; k < coursesAr.length;k++ ){
-      
+
       let courses = coursesAr[k];
       for ( let i=0; i< courses.length; i++){
         tmpCourses = {};
@@ -682,7 +704,7 @@
           tmpCourseCode = tmpIdAr[0];
           tmpCourseNumber = tmpCourseCode;
         }
-        
+
         tmpAccountName = course.accountName.split( ' (')[0].replace( '– AucklandOnline', '' ).replace( '– Manual', '' ).replace( "TFC-", "").trim();
         tmpAccountName = tmpAccountName.replace( "&", "and" );
         if (tmpAccountName in faculties){
@@ -691,6 +713,9 @@
           tmpFaculty = '';
         }
         tmpCourses["Course Name"] = course.title;
+        
+        tmpCourses["Year"] = getYearFromTermId(course.term);
+        tmpCourses["Term ID"] = course.term;
         tmpCourses["Course Code"] = tmpCourseCode;
         tmpCourses["Course Number"] = tmpCourseNumber;
         tmpCourses["Account Name"] = course.accountName;
@@ -725,65 +750,65 @@
           //
           if (course?.report?.rulesetData?.Links?.ruleData?.AnchorSuspiciousLinkText) {
               tmpCourses["AnchorSuspiciousLinkText"] = course.report.rulesetData.Links.ruleData.AnchorSuspiciousLinkText.checks-course.report.rulesetData.Links.ruleData.AnchorSuspiciousLinkText.passed;
-          } 
+          }
           if ( course?.report?.rulesetData?.PageHeadings ) {
               try{
                 tmpCourses["HeadersHaveText"] = course.report.rulesetData.PageHeadings.ruleData.HeadersHaveText.checks-course.report.rulesetData.PageHeadings.ruleData.HeadersHaveText.passed;
-              
+
                 tmpCourses["HeadingsInOrder"] = course.report.rulesetData.PageHeadings.ruleData.HeadingsInOrder.checks-course.report.rulesetData.PageHeadings.ruleData.HeadingsInOrder.passed;
               } catch(e){}
-              
-          } 
+
+          }
           if (course?.report?.rulesetData?.VideoConnection) {
             try{
               tmpCourses["VideoEmbedCheck"] = course.report.rulesetData.VideoConnection.ruleData.VideoEmbedCheck.checks-course.report.rulesetData.VideoConnection.ruleData.VideoEmbedCheck.passed;
               tmpCourses["IframeNotHandled"] = course.report.rulesetData.VideoConnection.ruleData.IframeNotHandled.checks-course.report.rulesetData.VideoConnection.ruleData.IframeNotHandled.passed;
             } catch(e) {}
-          } 
+          }
           if (course?.report?.rulesetData?.PageStructure) {
             try{
               tmpCourses["ContentTooLong"] = course.report.rulesetData.PageStructure.ruleData.ContentTooLong.checks-course.report.rulesetData.PageStructure.ruleData.ContentTooLong.passed;
-              tmpCourses["NoHeadings"] = course.report.rulesetData.PageStructure.ruleData.NoHeadings.checks-course.report.rulesetData.PageStructure.ruleData.NoHeadings.passed;  
+              tmpCourses["NoHeadings"] = course.report.rulesetData.PageStructure.ruleData.NoHeadings.checks-course.report.rulesetData.PageStructure.ruleData.NoHeadings.passed;
             }catch(e){}
-          } 
+          }
           if (course?.report?.rulesetData?.StyledHeading) {
             try{
               tmpCourses["ParagraphNotUsedAsHeader"] = course.report.rulesetData.StyledHeading.ruleData.ParagraphNotUsedAsHeader.checks-course.report.rulesetData.StyledHeading.ruleData.ParagraphNotUsedAsHeader.passed;
             }catch(e){}
-          } 
-          
+          }
+
           if (course?.report?.rulesetData?.Tables) {
             try{
               tmpCourses["TableDataShouldHaveTableHeader"] = course.report.rulesetData.Tables.ruleData.TableDataShouldHaveTableHeader.checks-course.report.rulesetData.Tables.ruleData.TableDataShouldHaveTableHeader.passed;
               tmpCourses["TableHeaderShouldHaveScope"] = course.report.rulesetData.Tables.ruleData.TableHeaderShouldHaveScope.checks-course.report.rulesetData.Tables.ruleData.TableHeaderShouldHaveScope.passed;
               tmpCourses["PreShouldNotBeUsedForTabularValues"] = course.report.rulesetData.Tables.ruleData.PreShouldNotBeUsedForTabularValues.checks-course.report.rulesetData.Tables.ruleData.PreShouldNotBeUsedForTabularValues.passed;
             }catch(e){}
-          } 
+          }
           if (course?.report?.rulesetData?.Color) {
             try{
               tmpCourses["CssTextHasContrast"] = course.report.rulesetData.Color.ruleData.CssTextHasContrast.checks-course.report.rulesetData.Color.ruleData.CssTextHasContrast.passed;
-              tmpCourses["CssTextStyleEmphasize"] = course.report.rulesetData.Color.ruleData.CssTextStyleEmphasize.checks-course.report.rulesetData.Color.ruleData.CssTextStyleEmphasize.passed;      
+              tmpCourses["CssTextStyleEmphasize"] = course.report.rulesetData.Color.ruleData.CssTextStyleEmphasize.checks-course.report.rulesetData.Color.ruleData.CssTextStyleEmphasize.passed;
             }catch(e){}
-          } 
+          }
           if (course?.report?.rulesetData?.Images) {
             try{
-              tmpCourses["ImageHasAltDecorative"] = course.report.rulesetData.Images.ruleData.ImageHasAltDecorative.checks-course.report.rulesetData.Images.ruleData.ImageHasAltDecorative.passed;    
-              tmpCourses["ImageHasAlt"] = course.report.rulesetData.Images.ruleData.ImageHasAlt.checks-course.report.rulesetData.Images.ruleData.ImageHasAlt.passed;    
-              tmpCourses["ImageAltNotPlaceholder"] = course.report.rulesetData.Images.ruleData.ImageAltNotPlaceholder.checks-course.report.rulesetData.Images.ruleData.ImageAltNotPlaceholder.passed; 
-              tmpCourses["ImageAltIsDifferent"] = course.report.rulesetData.Images.ruleData.ImageAltIsDifferent.checks-course.report.rulesetData.Images.ruleData.ImageAltIsDifferent.passed; 
-              tmpCourses["ImageAltIsTooLong"] = course.report.rulesetData.Images.ruleData.ImageAltIsTooLong.checks-course.report.rulesetData.Images.ruleData.ImageAltIsTooLong.passed; 
+              tmpCourses["ImageHasAltDecorative"] = course.report.rulesetData.Images.ruleData.ImageHasAltDecorative.checks-course.report.rulesetData.Images.ruleData.ImageHasAltDecorative.passed;
+              tmpCourses["ImageHasAlt"] = course.report.rulesetData.Images.ruleData.ImageHasAlt.checks-course.report.rulesetData.Images.ruleData.ImageHasAlt.passed;
+              tmpCourses["ImageAltNotPlaceholder"] = course.report.rulesetData.Images.ruleData.ImageAltNotPlaceholder.checks-course.report.rulesetData.Images.ruleData.ImageAltNotPlaceholder.passed;
+              tmpCourses["ImageAltIsDifferent"] = course.report.rulesetData.Images.ruleData.ImageAltIsDifferent.checks-course.report.rulesetData.Images.ruleData.ImageAltIsDifferent.passed;
+              tmpCourses["ImageAltIsTooLong"] = course.report.rulesetData.Images.ruleData.ImageAltIsTooLong.checks-course.report.rulesetData.Images.ruleData.ImageAltIsTooLong.passed;
             }catch(e){}
-                        
-          } 
-          
-          
+
+          }
+
+
         }
 
         //////
         coursesData.push( tmpCourses );
       }
     } //  end for coursesAr
-    //order by course name 
+    //order by course name
     coursesData.sort((a, b) => (a['Course Name'] > b['Course Name']) ? 1 : -1);
 
 
@@ -856,7 +881,7 @@
             'value': 0
           });
           $('#jj_progress_dialog').dialog('open');
-          
+
         }
       } else {
         if (!aborted) {
@@ -867,11 +892,11 @@
     } catch (e) {
       errorHandler(e);
     }
-    
+
   }
-  
+
   function resetData(){
-    
+
     pending = - 1;
     termIndex = -1;
     fetched = 0;
