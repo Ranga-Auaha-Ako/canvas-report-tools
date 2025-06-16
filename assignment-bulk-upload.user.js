@@ -10,7 +10,7 @@
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://unpkg.com/xlsx/dist/xlsx.full.min.js
 // @require     https://raw.githubusercontent.com/gildas-lormeau/zip.js/master/dist/zip-fs-full.min.js
-// @version     0.3
+// @version     0.4
 // @grant       none
 // ==/UserScript==
 // based on code from James Jones' Canvancement https://github.com/jamesjonesmath/canvancement
@@ -33,7 +33,7 @@
   var assignmentId;
   var sections = {};
   var debug = 0;
-  var debugCheckStudents = 1;
+  var debugCheckStudents = 0;
   var submissionAr = [];
   var aborted = false;
   var today = new Date();
@@ -265,7 +265,7 @@
         if (debug) console.log( "pending:", pending );
 
         if (pending <= 0) {
-
+          if (debug) console.log( "original studentIDarray", {studentIdArray} );
             //showUploadForm( );
 
         } else{}
@@ -353,9 +353,21 @@
                 // get all entries from the zip
                 fileEntries = await tmpreader.getEntries();
                 for (let i=0;i<fileEntries.length;i++){
-                    fileNameArray.push( fileEntries[i].filename );
+                  if ( debug ) console.log(fileEntries[i].filename);
+                    try {
+                      let tmpF = fileEntries[i].filename.split('/').pop();
+                      if ( debug ) console.log( {tmpF} );
+                      //if ( tmpF!="" ){
+                        fileNameArray.push( tmpF ); 
+                      //}
+                       
+                    }
+                    catch(e){
+                      fileNameArray.push( fileEntries[i].filename );
+                    }
+                    
                 }
-                if (debug) console.log({fileEntries});
+                if (debug) console.log({fileNameArray});
                 if (fileEntries && fileEntries.length) {
                    if (debug) console.log( {fileEntries} );
                 }
@@ -409,16 +421,23 @@
         } else {
           //user auid
           let tmpId = ''+studentsFromExcel[i][1];
-          if ( studentIdArray.includes( tmpId ) ){
-              studentIdArray = studentIdArray.filter((value)=>value!=tmpId);
-              
-          } else {
-              studentNotInCourse.push( studentsFromExcel[i][1] +'('+ studentsFromExcel[i][0] + ')<br>' );
+          if ( tmpId.trim()!="" ){
+            
+            if (debug) console.log( "check students tmpId:", {tmpId} );
+            if (debug) console.log( {studentIdArray} );
+            if ( studentIdArray.includes( tmpId ) ){
+                studentIdArray = studentIdArray.filter((value)=>value!=tmpId);
+                
+            } else {
+                studentNotInCourse.push( studentsFromExcel[i][1] +'('+ studentsFromExcel[i][0] + ')<br>' );
+            }
+            studentsNotInExcel = studentIdArray;
           }
-          studentsNotInExcel = studentIdArray;
+          
         } // end if useUserId
         
     } // end for studentsFromExcel
+    if (debug) console.log( "end studentsFromExcel loop,", {studentIdArray}, {studentsNotInExcel} );
     if ( studentsNotInExcel.length>0 ){
       missingStr+='<h3>Students not included in the upload:</h3>';
       for ( let i=0; i<studentsNotInExcel.length;i++){
@@ -747,7 +766,7 @@
               jQuery( '#uploadProgress'  ).val(  targetI );
               jQuery( '#numFinished'  ).html(  targetI );
               
-              console.log( 'step3 success:', targetI ); 
+              if (debug) console.log( 'step3 success:', targetI ); 
               formData = null;
               nextUpload();
               //doing=0;
