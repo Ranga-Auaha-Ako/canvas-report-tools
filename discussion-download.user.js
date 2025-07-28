@@ -5,11 +5,9 @@
 // @description For Canvas users, this tool generates a .CSV download of the quiz submissions information
 // @downloadURL https://github.com/clearnz/canvas-report-tools/raw/master/discusson-download.user.js
 // @include     https://*/courses/*/discussion_topics/*
-// @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
-// @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/jszip.min.js
-// @version     0.1.5
+// @version     0.2
 // @grant       none
 // ==/UserScript==
 
@@ -45,12 +43,16 @@
  
   today = (yyyy-2000 ) + '-' + mm  + '-' + dd + '-' + Math.floor(Date.now() /1000) ;
   var aborted = false;
-  addDiscussionDownloadButton();
+  $( document ).ready( 
+    setTimeout( addDiscussionDownloadButton, 5000)
+
+    //function(){ addDiscussionDownloadButton(); } 
+  );
 
   function addDiscussionDownloadButton() {
 
         if ($('#discusson-topic-download').length === 0) {
-          $('.pull-right').first().append('<a href="javascript:void(0)" id="discusson-topic-download" class="btn"><i class="icon-download"></i> Download for TurnItIn</a>');
+         jQuery('#discussion-redesign-layout').before('<a href="javascript:void(0)" id="discusson-topic-download" class="btn"><i class="icon-download"></i> Download discussions</a>');
           $('#discusson-topic-download').one('click', {
             type: 2
           }, discussionSubmissionReport);
