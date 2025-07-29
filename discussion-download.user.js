@@ -6,21 +6,22 @@
 // @downloadURL https://github.com/clearnz/canvas-report-tools/raw/master/discusson-download.user.js
 // @include     https://*/courses/*/discussion_topics/*
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
-// @require     https://flexiblelearning.auckland.ac.nz/javascript/jszip.min.js
+// @require     https://flexiblelearning.auckland.ac.nz/javascript/xlsx.full.min.js
 // @version     0.2
 // @grant       none
 // ==/UserScript==
-
+/* global $, jQuery,XLSX,saveAs */
 // based on code from James Jones' Canvancement https://github.com/jamesjonesmath/canvancement
 
 (function () {
   'use strict';
+  var userData = {};
   var participants = {};
   //
 
   //
   var discussionPosts = [
-  ]; // quiz_submissions is array of objects
+  ]; 
   var pending = - 1;
   var fetched = 0;
   var needsFetched = 0;
@@ -32,7 +33,6 @@
   var dd = today.getDate();
   var mm = today.getMonth() + 1;
   var yyyy = today.getFullYear();
-  var zip = new JSZip();
   var debug = 0;
   if (dd < 10) {
     dd = '0' + dd;
@@ -98,10 +98,14 @@
     courseId = getCourseId();
     discussionId = getdiscussionId();
     if (debug) console.log( courseId, discussionId );
+    var url = '/api/v1/courses/' + courseId + '/sections?include[]=students&include[]=email&per_page=50';
+    //progressbar();
+    pending = 0;
+    getStudents( url, courseId );
     //var url = '/api/v1/courses/' + courseId + '/discussion_topics/' + discussionId + "/view";
     //progressbar();
     pending = 0;
-    getDiscussionSubmissions( courseId, discussionId );
+    //getDiscussionSubmissions( courseId, discussionId );
 
   }
 
@@ -118,8 +122,58 @@
       }
     }
     return url;
-  }
 
+  }
+  function getStudents( url, courseId ) { //cycles through the student list
+    try {
+      if (aborted) {
+        throw new Error('Aborted');
+      }
+      jQuery("#doing").html( "Fetching student informaton <img src='https://flexiblelearning.auckland.ac.nz/images/spinner.gif'/>" );
+      pending++;
+      $.getJSON(url, function (udata, status, jqXHR) {
+        url = nextURL(jqXHR.getResponseHeader('Link'));
+        //console.log("nextUrl", url);
+        for (var i = 0; i < udata.length; i++) {
+          var section = udata[i];
+          try {
+              if (section.students.length > 0) {
+                  for (var j = 0; j < section.students.length; j++) {
+                      // login_id === upi
+                      var user = section.students[j];
+                      var splitname = user.sortable_name.split(',');
+                      user.firstname = splitname[1].trim();
+                      user.surname = splitname[0].trim();
+                      user.sectionName = section.name;
+                      user.post = "";
+                      user.reply = "";
+                      userData[user.id] = user;
+                      
+                  } // end for
+              } // end if length>0
+          } catch(e){ continue; }
+        }
+        if (debug) console.log( "next url ?", url );
+        if (debug) console.log( "number ss:", studentIdAr.length );
+        if (url) {
+          getStudents( url, courseId );
+        }
+        pending--;
+        if (debug) console.log( "pending:", pending );
+
+        if (pending <= 0) {
+          console.log( {userData} );
+          getDiscussionSubmissions( courseId, discussionId );
+
+        }
+      }).fail(function () {
+        pending--;
+        throw new Error('Failed to load list of students');
+      });
+    } catch (e) {
+      errorHandler(e);
+    }
+  }
   
   function getDiscussionSubmissions( courseId, discussionId ) { //cycles through student list
     pending = 0;
@@ -143,7 +197,7 @@
       }
       jQuery("#doing").html( "Fetching Discission Post information <img src='https://flexiblelearning.auckland.ac.nz/images/spinner.gif'/>" );
       pending++;
-      progressbar(fetched, needsFetched);
+      //progressbar(fetched, needsFetched);
       $.getJSON(url, function (adata, status, jqXHR) {
         //get participants:  id, display_name
         for ( var i=0; i < adata["participants"].length; i++ ) {
@@ -161,7 +215,7 @@
         }
         pending--;
         fetched+=50;
-        progressbar(fetched, needsFetched);
+        //progressbar(fetched, needsFetched);
         
         if (debug) console.log( "pending:", pending  );
         if (pending <= 0 && !aborted) {
@@ -170,7 +224,7 @@
       }).fail(function () {
         pending--;
         fetched+=50;
-        progressbar(fetched, needsFetched);
+        //progressbar(fetched, needsFetched);
         if (!aborted) {
           console.log('Some report data failed to load');
         }
@@ -223,13 +277,11 @@
     var tmpName;
     var blob;
     var savename;
-    
+    let userId;
 
-    try {
-        discussionTitle=document.title.split( ":" )[1].replace(/[^\w]/g, "");
-    } catch(e){
-      discussionTitle=document.title.replace(/[^\w]/g, "");
-    }
+    
+    discussionTitle=document.title;
+    
     if (debug) console.log( "discussionTitle:", discussionTitle );
     if (debug) console.log( "participants:", participants );
     if (debug) console.log( "discussionPosts:", discussionPosts );
@@ -240,42 +292,65 @@
       } catch(e){
         tmpPost = "";
       }
+      userId = discussionPosts[i].user_id;
+      
       try { 
         tmpName = participants[discussionPosts[i].user_id].display_name.replace(/ /g, "");
       } catch(e){
         tmpName= "";
       }
       if ( tmpName !="" && tmpPost!="" ) {
-        //blob = new Blob([csv], {
-         // 'type': 'text/plain;charset=utf-8'
-        //});
+        try{
+          userData[userId].post = userData[userId].post + tmpPost;
+        }catch(e){}
         
-        savename = 'course-' + courseId + '-discussion-' + discussionTitle + '-' + tmpName + '-' + discussionPosts[i].id + '.txt';
-        if (debug) console.log( "savename:", savename ); 
-        if (debug) console.log( "post:", tmpPost ); 
-        zip.file( savename, tmpPost ); 
-        //saveAs(blob, savename);
-        //process reply array
+        
         if ( 'replies' in discussionPosts[i] ) {
           processReplies( courseId, discussionTitle, tmpName, discussionPosts[i].replies );
         }
       }
     }
-    zip.generateAsync({type:"blob"})
-        .then(function(content) {
-        // Force down of the Zip file
-        saveAs(content, discussionTitle+".zip");
-    });
- 
+    //generate the output
+    console.log( {userData} );
+    let reportData = [];
+    for (const tmpId in userData) {
+      reportData.push( userData[tmpId] );
+    }
+    console.log( { reportData });
+    var wb = XLSX.utils.book_new();
+      wb.Props = {
+        Title: "Discussion reports",
+        Subject:"Discussion Reports",
+        Author: "",
+        CreatedDate: new Date()
+      };
+     
+      let tmpWs = XLSX.utils.json_to_sheet( reportData  );
+      XLSX.utils.book_append_sheet( wb, tmpWs, "Students" );
+      let wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+      blob = new Blob([ s2ab(wbout) ], {
+        'type': 'application/octet-stream'
+      });
+
+      savename = `${discussionTitle} Reports-${today}.xlsx`;
+      saveAs(blob, savename);
+      alert( "Discussion report downloaded" );
   }
+
+  
 
 function processReplies( courseId, discussionTitle, msgOwner, replyAr ){
   var tmpReplyObj;
   var tmpName;
   var tmpPost;
   var savename;
+  let userId;
   for (var i = 0; i < replyAr.length; i++) {
+      
       tmpReplyObj = replyAr[i];
+      
+      userId = tmpReplyObj.user_id;
+      console.log( {tmpReplyObj}, {userId}  );
       try { 
         tmpName = participants[tmpReplyObj.user_id].display_name.replace(/ /g, "");
       } catch(e){
@@ -287,16 +362,10 @@ function processReplies( courseId, discussionTitle, msgOwner, replyAr ){
         tmpPost = "";
       }
       if ( tmpName !="" && tmpPost!="" && tmpPost.length>20 ) {
-       // blob = new Blob([csv], {
-       //   'type': 'text/plain;charset=utf-8'
-       // });
+        try{
+          userData[userId].reply = userData[userId].reply + tmpPost;
+        } catch(e){}
         
-        savename = 'course-' + courseId + '-discussion-' + discussionTitle + '-' + tmpName + '-reply-' + msgOwner + '-' + tmpReplyObj.id  + '.txt';
-        if (debug) console.log( "savename:", savename ); 
-        if (debug) console.log( "post:", tmpPost ); 
-        zip.file( savename, tmpPost ); 
-        //saveAs(blob, savename);
-        //process reply array
         if ( 'replies' in tmpReplyObj ) {
           processReplies( courseId, discussionTitle, tmpName, tmpReplyObj.replies );
         }
@@ -384,10 +453,18 @@ function createDiscussionPost() {
   function resetData(){
     userData = {};
     quiz_submissions = [];
-    attemptAr = new Object();
     pending = - 1;
     fetched = 0;
     needsFetched = 0;
+  }
+  //convert the binary data into octet
+  function s2ab(s) {
+    var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+    var view = new Uint8Array(buf);  //create uint8array as viewer
+    for (var i=0; i<s.length; i++) {
+      view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+    }
+    return buf;
   }
 
   function errorHandler(e) {
