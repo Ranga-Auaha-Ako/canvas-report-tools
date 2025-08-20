@@ -9,7 +9,7 @@
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/xlsx.full.min.js
 // @resource    REMOTE_CSS https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-1682390572.css
-// @version     0.7
+// @version     0.8
 // @grant       GM_getResourceText
 // @grant       GM_addStyle
 // ==/UserScript==
@@ -26,34 +26,51 @@
   // to combine 2022, 2023: term id: 234, 231, 230, 243, 241
 
   var terms = {
-    "243": "2023 Semester One",
-    "242": "2023 Academic Year Term",
-    "241": "2023 Quarter One",
-    "234": "2022 Semester Two",
-    "244": "2023 Quarter Two",
-    "240": "2023 Summer School",
-    "245": "2023 Semester Two",
-    "231": "2022 Semester One",
-    "230": "2022 Summer School",
-    "247": "2023 Quarter Four",
-    "246": "2023 Quarter Three",
-    "250": "2024 Summer School",
-    "228": "2022 Academic Year Term",
-    "248": "2023 Doctoral Academic Year",
-    "251": "2024 Quarter One",
-    "252": "2024 Quarter Two",
-    "235": "2022 Quarter Three",
-    "253": "2024 Quarter Three",
-    "355": "2024 Semester One",
-    "356": "2024 Semester Two",
-    "357": "2024 Academic Year Term",
-} ;
-  //var termsAr = [ "230", "231", "234", "241", "243" ];
-  //var termsAr = [ "1","71","106", "108","111", "217", "218", "222", "228", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251" ]; // make it shorter, just for quicker test purpose
-  //var termsAr = [ "1", "230", "231", "234","235","240", "241", "243","244", "245","246","247","248","250","251", "252", "253", "355", "356", "357" ]; // make it shorter, just for quicker test purpose
-  //var termsAr = [ "250","251", "252", "253", "355", "356", "357", "358", "360", "361", "362", "363", "365" ];
-  //var termsAr = [ "358", "360", "361", "362", "363", "365" ];
-  //  var termsAr = [ "363" ];
+            "1": "Default term",
+            "243": "2023 Semester One",
+            "242": "2023 Academic Year Term",
+            "241": "2023 Quarter One",
+            "222": "2021 Quarter Two",
+            "234": "2022 Semester Two",
+            "244": "2023 Quarter Two",
+            "240": "2023 Summer School",
+            "245": "2023 Semester Two",
+            "231": "2022 Semester One",
+            "111": "2020 Semester Two",
+            "106": "2020 Academic Year Term",
+            "218": "2021 Semester Two",
+            "230": "2022 Summer School",
+            "64": "2019 Semester Two",
+            "217": "2021 Semester One",
+            "108": "2020 Semester One",
+            "63": "2019 Semester One",
+            "71": "2020 Summer School",
+            "57": "2018 Semester Two",
+            "247": "2023 Quarter Four",
+            "246": "2023 Quarter Three",
+            "228": "2022 Academic Year Term",
+            "248": "2023 Doctoral Academic Year",
+            "251": "2024 Quarter One",
+            "250": "2024 Summer School",
+            "235": "2022 Quarter Three",
+            "361": "2025 Academic Year Term",
+            "355": "2024 Semester One",
+            "356": "2024 Semester Two",
+            "357": "2024 Academic Year Term",
+            "252": "2024 Quarter Two",
+            "249": "2023 Late Year Term",
+            "254": "2024 Quarter Four",
+            "365": "2025 Semester Two",
+            "253": "2024 Quarter Three",
+            "363": "2025 Semester One",
+            "358": "2024 Late Year Term",
+            "360": "2025 Summer School",
+            "362": "2025 Quarter One",
+            "364": "2025 Quarter Two",
+            "3": "2015 Semester One",
+            "366": "2025 Quarter Three"
+        };
+
 
 
   var termsAr = [ 
@@ -71,6 +88,7 @@
 
   //var termsAr = [ "231" ]; // make it shorter, just for quicker test purpose
   var termIndex = -1;
+  var courseIndex = -1;
   var tokenId = getToken();
   //global array to collect reports, issues, file_issues, actions
   var reportsAr = [];
@@ -78,17 +96,21 @@
   var file_issuesAr = [];
   var actionsAr = [];
   var coursesAr = [];
+  //var enrollmentsAr = {};
+  var tmpUserAr = [];
   //https://apac.udoit3.ciditools.com/api/admin/courses/account/1/term/253?subaccounts=true
   var urlAr = [
   'https://apac.udoit3.ciditools.com/api/admin/reports/account/1/term/{termId}?subaccounts=true',
   'https://apac.udoit3.ciditools.com/api/admin/issues/account/1/term/{termId}?subaccounts=true',
   'https://apac.udoit3.ciditools.com/api/admin/file_issues/account/1/term/{termId}?subaccounts=true',
   'https://apac.udoit3.ciditools.com/api/admin/file_actions/account/1/term/{termId}?subaccounts=true',
-  'https://apac.udoit3.ciditools.com/api/admin/courses/account/1/term/{termId}?subaccounts=true'
+  'https://apac.udoit3.ciditools.com/api/admin/courses/account/1/term/{termId}?subaccounts=true',
+  'https://canvas.auckland.ac.nz/api/v1/courses/{courseId}/enrollments?type[]=StudentEnrollment&access_token={accessToken}'
  ];
 
   var faculties = {
   "Arts":"Arts",
+  "Arts and Education":"Arts",
   "Humanities":"Arts",
   "Social Sciences":"Arts",
   "Cultures, Languages and Linguistics":"Arts",
@@ -99,6 +121,8 @@
   "Architecture and Planning":"Creative Arts and Industries",
   "Biological Sciences":"Science",
   "Business and Economics":"Business and Economics",
+  "Business":"Business and Economics",
+  "GSM - MBA Programmes":"Business and Economics",
   "Chemical and Materials Engineering":"Engineering",
   "Chemical Sciences":"Science",
   "Civil and Environmental Engineering":"Engineering",
@@ -108,9 +132,12 @@
   "Critical Studies in Education":"Education",
   "Curriculum and Pedagogy":"Education",
   "Dance Studies Programme":"Creative Arts and Industries",
+  "Design Programme":"Creative Arts and Industries",
   "Economics":"Business and Economics",
   "Creative Arts & Industries":"Creative Arts and Industries",
+  "Creative Arts and Industries":"Creative Arts and Industries",
   "Education and Social Work":"Education",
+  "Engineering and Design":"Engineering",
   "Electrical and Computer Engineering":"Engineering",
   "Engineering":"Engineering",
   "Engineering Science":"Engineering",
@@ -127,11 +154,14 @@
   "Marine Science":"Science",
   "Marketing":"Business and Economics",
   "Mathematics":"Science",
+  "MBChB Courses":"FMHS",
   "Mechanical Engineering":"Engineering",
   "Medical Sciences":"FMHS",
+  "Medical and Health Sciences":"FMHS",
   "Medicine":"FMHS",
   "Music":"Creative Arts and Industries",
   "Nursing":"FMHS",
+  "Optometry and Vision Science":"FMHS",
   "Pharmacy":"FMHS",
   "Physics":"Science",
   "Population Health":"FMHS",
@@ -249,6 +279,7 @@
       if (debugCourse) console.log( {coursesAr} );
       //deal with report
       //each report array in own worksheet
+      //getEnrollmentsAr();
       generateReports();
     }
 
@@ -384,8 +415,7 @@
       throw new Error('Failed to load fileActions');
     });
   }
-
-
+ 
 
   function getToken() { //identifies course ID from URL
     var debug = 1;
@@ -405,8 +435,7 @@
     return tokenId;
   }
 
-  function generateReports() {
-
+  async function generateReports() {
 
     try {
       if (aborted) {
@@ -443,6 +472,10 @@
       let coursesData = genCoursesAr();
       tmpWs = XLSX.utils.json_to_sheet( coursesData  );
       XLSX.utils.book_append_sheet( wb, tmpWs, "Courses" );
+      
+      let coursesData1 = genCoursesAr( 1 );
+      tmpWs = XLSX.utils.json_to_sheet( coursesData1  );
+      XLSX.utils.book_append_sheet( wb, tmpWs, "Courses exclue 0 error pg level" );
 
       let wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
       let blob = new Blob([ s2ab(wbout) ], {
@@ -683,16 +716,17 @@
     return fileIssueData;
   }
 
-  function genCoursesAr(){
+  function genCoursesAr( skipZeroError=0 ){
     let coursesData = [];
     let tmpCourses, course;
-    let tmpIdAr, tmpCourseCode, tmpAccountName, tmpCourseNumber, tmpFaculty;
+    let tmpIdAr, tmpCourseCode, tmpAccountName, tmpCourseNumber, tmpFaculty, totalErrors;
     //console.log( {coursesAr} );
     //coursesAr is array of array
     for ( let k=0; k < coursesAr.length;k++ ){
 
       let courses = coursesAr[k];
       for ( let i=0; i< courses.length; i++){
+
         tmpCourses = {};
         course = courses[i];
         tmpCourses["Course Name"] = course.title;
@@ -705,8 +739,15 @@
           tmpCourseNumber = tmpCourseCode;
         }
 
-        tmpAccountName = course.accountName.split( ' (')[0].replace( '– AucklandOnline', '' ).replace( '– Manual', '' ).replace( "TFC-", "").trim();
+        totalErrors = course.report.errors + course.report.suggestions;
+        if ( totalErrors==0 && skipZeroError && ["7", "8"].includes(tmpCourseNumber[0]) ){
+          continue;
+        }
+        tmpAccountName = course.accountName.split( ' (')[0].replace( '\u2013 UoA Online', '' ).replace('- UoA Online','').replace( '– Manual', '' ).replace( "TFC -", "").trim();
         tmpAccountName = tmpAccountName.replace( "&", "and" );
+        if ( tmpAccountName.includes( 'Online' ) ){
+          console.log( { tmpAccountName } );
+        }
         if (tmpAccountName in faculties){
           tmpFaculty = faculties[ tmpAccountName ];
         } else {
@@ -716,11 +757,21 @@
         
         tmpCourses["Year"] = getYearFromTermId(course.term);
         tmpCourses["Term ID"] = course.term;
+        tmpCourses["Term"] = terms[course.term];
         tmpCourses["Course Code"] = tmpCourseCode;
         tmpCourses["Course Number"] = tmpCourseNumber;
         tmpCourses["Account Name"] = course.accountName;
         tmpCourses["Faculty"] = tmpFaculty;
         tmpCourses["Last Scanned"] = course.lastUpdated;
+        tmpCourses["Total Errors"] = course.report.errors + course.report.suggestions;
+        if (skipZeroError==0 ){
+          if ( totalErrors ==0 && tmpCourses["Course Number"][0]=="7"){
+            tmpCourses["Exclude"] = 'T'; 
+          } else {
+            tmpCourses["Exclude"] = ''; 
+          }
+        }
+        
         tmpCourses["Errors"] = course.report.errors;
         tmpCourses["Suggestions"] = course.report.suggestions;
         tmpCourses["Content Fixed"] = course.report.contentFixed;
@@ -922,4 +973,3 @@
     console.log(e.name + ': ' + e.message);
   }
 }) ();
-
