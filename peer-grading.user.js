@@ -8,9 +8,13 @@
 // @require     https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js
 // @require     https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
-// @version     0.1.5
-// @grant       none
+// @resource     REMOTE_CSS https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-1682390572.css
+// @version     0.1.6
+// @grant        GM_getResourceText
+// @grant        GM_addStyle
+// @grant        unsafeWindow
 // ==/UserScript==
+/* global $, jQuery,saveAs */
 
 // based on code from James Jones' Canvancement https://github.com/jamesjonesmath/canvancement
 
@@ -18,6 +22,9 @@
   'use strict';
   var userData = {
   };
+  //nst myCss = GM_getResourceText("REMOTE_CSS");
+  //_addStyle(myCss);
+  GM_addStyle(".ui-dialog { z-index:999; }");
   //
   var peer_assessments = [
   ];
@@ -101,6 +108,7 @@
     var courseId = getCourseId();
     var assignmentId = getAssignmentId();
     var url = '/api/v1/courses/' + courseId + '/assignments/' + assignmentId;
+    
     $.getJSON(url, function (adata, status, jqXHR) {
       rubricId = adata.rubric_settings.id;
       if (debug) console.log( "rubricId:", rubricId );
@@ -137,6 +145,7 @@
   }
 
   function getStudents( url, courseId, assignmentId, rubricId ) { //cycles through the student list
+    jQuery("#doing").html( "Fetching data <img src='https://flexiblelearning.auckland.ac.nz/images/spinner.gif'/>" );
     try {
       if (aborted) {
         throw new Error('Aborted');
@@ -509,11 +518,12 @@ function createPeerAssessmentCSV() {
   }
 
   function progressbar(x, n) {
+    jQuery( '#j_progress_dialog' ).css("z-index", 999);
     try {
       if (typeof x === 'undefined' || typeof n == 'undefined') {
         if ($('#jj_progress_dialog').length === 0) {
           $('body').append('<div id="jj_progress_dialog"></div>');
-          $('#jj_progress_dialog').append('<div id="jj_progressbar"></div>');
+          $('#jj_progress_dialog').append('<div id="jj_progressbar"></div><br><small id="doing"></small>');
           $('#jj_progress_dialog').dialog({
             'title': 'Fetching Report',
             'autoOpen': false,
