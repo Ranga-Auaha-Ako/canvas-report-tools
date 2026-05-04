@@ -10,7 +10,7 @@
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://unpkg.com/xlsx/dist/xlsx.full.min.js
 // @require     https://raw.githubusercontent.com/gildas-lormeau/zip.js/refs/heads/master/dist/zip-fs.js
-// @version     0.4
+// @version     0.5
 // @grant       none
 // ==/UserScript==
 // based on code from James Jones' Canvancement https://github.com/jamesjonesmath/canvancement
