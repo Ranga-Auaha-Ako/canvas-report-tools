@@ -9,7 +9,7 @@
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/filesaver.js
 // @require     https://flexiblelearning.auckland.ac.nz/javascript/xlsx.full.min.js
 // @resource    REMOTE_CSS https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/new_styles_normal_contrast/bundles/common-1682390572.css
-// @version     0.8
+// @version     0.9
 // @grant       GM_getResourceText
 // @grant       GM_addStyle
 // ==/UserScript==
@@ -73,16 +73,18 @@
 
 
 
-  var termsAr = [ 
-  "240", "241", "242", "243", "244", "245", "246", "247", "248", "249",// 2023
-  "250", "251", "252", "253", "254","355", "356", "357",               // 2024
-  "358", "360", "361", "362", "363", "364","365"                       // 2025
-];
+  var termsAr = [
+  //"240", "241", "242", "243", "244", "245", "246", "247", "248", "249",// 2023
+  //"250", "251", "252", "253", "254","355", "356", "357",               // 2024
+  //"358", "360", "361", "362", "363", "364","365"                       // 2025
+"370","371","372", "373", "374","375","376","377","378","379"               // 2026
+  ];
 
  function getYearFromTermId(termId) {
   if (["240", "241", "242", "243", "244", "245", "246", "247", "248", "249"].includes(termId)) return "2023";
   if (["250", "251", "252", "253", "254","355", "356", "357", "358"].includes(termId)) return "2024";
   if (["360", "361", "362", "363", "364", "365"].includes(termId)) return "2025";
+  if (["370","371","372", "373", "374","375","376","377","378","379" ].includes(termId)) return "2026";
   return "";
 }
 
@@ -208,7 +210,7 @@
       //try {
         if ( tokenId!=null ){
             if ($('#download-report').length === 0) {
-                $('.css-e4i4eu-truncateList-appNav__list').append('<li class="css-166z3xu-truncateList__listItem"><button dir="ltr" id="download-report" cursor="pointer" class="css-13npier-view--flex-item"><span class="css-1f9ldn1-item__label">Download 2023/24/25 Reports</span></button></li>');
+                $('.css-1rc109g-truncateList-topNavBarMenuItems').append('<li class="css-1gin3qt-truncateList__listItem"><button dir="ltr" id="download-report" cursor="pointer" class="css-13npier-view--flex-item"><span class="css-1f9ldn1-item__label">Download 2026 Reports</span></button></li>');
 
                 $('#download-report').one('click', {
                   type: 1
@@ -415,7 +417,7 @@
       throw new Error('Failed to load fileActions');
     });
   }
- 
+
 
   function getToken() { //identifies course ID from URL
     var debug = 1;
@@ -472,7 +474,7 @@
       let coursesData = genCoursesAr();
       tmpWs = XLSX.utils.json_to_sheet( coursesData  );
       XLSX.utils.book_append_sheet( wb, tmpWs, "Courses" );
-      
+
       let coursesData1 = genCoursesAr( 1 );
       tmpWs = XLSX.utils.json_to_sheet( coursesData1  );
       XLSX.utils.book_append_sheet( wb, tmpWs, "Courses exclue 0 error pg level" );
@@ -482,7 +484,7 @@
         'type': 'application/octet-stream'
       });
 
-      let savename = '2023/24/25 UDOIT Reports' +'-' + today + '.xlsx';
+      let savename = '2026 UDOIT Reports' +'-' + today + '.xlsx';
       saveAs(blob, savename);
 
       $('#download-report').one('click', {
@@ -577,7 +579,7 @@
     let issueMapping = {
       'Paragraph Not Used As Header':'Paragraph Not Used As Header',
       'Anchor Suspicious Link Text':'Link Has Nondescript Text',
-      'Css Text Style Emphasize':'Avoid Using Color Alone for Emphasis',
+      'Css Text Style Emphasize':'Potential Use of Color Alone to Communicate Information',
       'Video Embed Check':'Closed Captions Cannot Be Checked',
       'Table Data Should Have Table Header':'No Table Headers Found',
       'Image Alt Is Different':'Alternative Text Should Not Be the Image Filename' ,
@@ -754,7 +756,7 @@
           tmpFaculty = '';
         }
         tmpCourses["Course Name"] = course.title;
-        
+
         tmpCourses["Year"] = getYearFromTermId(course.term);
         tmpCourses["Term ID"] = course.term;
         tmpCourses["Term"] = terms[course.term];
@@ -766,12 +768,12 @@
         tmpCourses["Total Errors"] = course.report.errors + course.report.suggestions;
         if (skipZeroError==0 ){
           if ( totalErrors ==0 && tmpCourses["Course Number"][0]=="7"){
-            tmpCourses["Exclude"] = 'T'; 
+            tmpCourses["Exclude"] = 'T';
           } else {
-            tmpCourses["Exclude"] = ''; 
+            tmpCourses["Exclude"] = '';
           }
         }
-        
+
         tmpCourses["Errors"] = course.report.errors;
         tmpCourses["Suggestions"] = course.report.suggestions;
         tmpCourses["Content Fixed"] = course.report.contentFixed;
